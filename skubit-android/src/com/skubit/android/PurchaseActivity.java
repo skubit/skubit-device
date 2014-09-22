@@ -16,6 +16,7 @@
 
 package com.skubit.android;
 
+import net.skubit.android.R;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
