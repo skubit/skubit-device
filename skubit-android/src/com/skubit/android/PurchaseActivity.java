@@ -55,7 +55,7 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
 
         intent.putExtra("PurchaseActivity.account", googleAccount);
         intent.putExtra("PurchaseActivity.purchaseData", parcel.marshall());
-        intent.setClassName("com.skubit.android",
+        intent.setClassName("net.skubit.android",
                 PurchaseActivity.class.getName());
         return intent;
     }
