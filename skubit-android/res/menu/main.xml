@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.skubit.android.MainActivity" >
+
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="1"
+        android:showAsAction="always" 
+        android:title="About"/>
+    <item
+        android:id="@+id/action_privacy"
+        android:orderInCategory="2"
+        android:title="Privacy"
+        android:showAsAction="ifRoom" >
+    </item>
+    <item
+        android:id="@+id/action_help"
+        android:orderInCategory="3"
+        android:title="Help"
+        android:showAsAction="ifRoom" >
+    </item>    
+    <item
+        android:id="@+id/action_signout"
+        android:orderInCategory="4"
+        android:title="Sign Out"
+        android:showAsAction="ifRoom" >
+    </item>        
+</menu>

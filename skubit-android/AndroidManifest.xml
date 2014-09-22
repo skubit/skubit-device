@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.skubit.android"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="19" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="com.skubit.BILLING" />
+
+    <permission
+        android:name="com.skubit.BILLING"
+        android:description="@string/perm_billing"
+        android:protectionLevel="normal" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name="com.skubit.android.SkubitAndroidActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+       <activity
+            android:name="com.skubit.android.PurchaseActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="com.skubit.BILLING"
+            android:theme="@style/PurchaseDialog"
+            android:windowSoftInputMode="adjustPan"></activity>
+       
+        <service
+            android:name="com.skubit.android.billing.BillingService"
+            android:permission="com.skubit.BILLING" >
+            <intent-filter>
+                <action android:name="com.skubit.android.billing.IBillingService.BIND" />
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>
