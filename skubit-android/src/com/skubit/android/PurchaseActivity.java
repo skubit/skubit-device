@@ -32,6 +32,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.skubit.android.billing.BillingResponseCodes;
 import com.skubit.android.billing.PurchaseData;
 import com.skubit.android.services.InventoryService;
 import com.skubit.android.services.PurchaseService;
@@ -78,6 +79,13 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
 
     private TextView mTitle;
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        setResult(BillingResponseCodes.RESULT_USER_CANCELED,
+                new Intent().putExtra("RESPONSE_CODE", BillingResponseCodes.RESULT_USER_CANCELED));
+    }
+
     private void getSkuDetails() {
         mInventoryService.getSkuDetails(mPurchaseData.packageName,
                 mPurchaseData.sku, new Callback<SkuDetailsDto>() {
@@ -85,7 +93,7 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                     @Override
                     public void failure(RetrofitError error) {
                         error.printStackTrace();
-                        showMessage("Failed to find SKU");
+                        showMessage("Unable to find the SKU you requested");
                     }
 
                     @Override
@@ -104,6 +112,7 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                         String message = MessageFormat.format("{0} ({1})",
                                 skuDetailsDto.getDescription(), skuDetailsDto.getTitle());
                         mTitle.setText(message);
+                        setResult(0, new Intent().putExtra("RESPONSE_CODE", 0));
                     }
 
                 });
@@ -200,6 +209,7 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                     public void success(final PurchaseDataDto purchaseDataDto,
                             Response response) {
                         showMessage("Purchase successful");
+                        setResult(0, new Intent().putExtra("RESPONSE_CODE", 0));
                     }
 
                 });
