@@ -179,8 +179,8 @@ public class BillingServiceBinder extends IBillingService.Stub {
     }
 
     private Account getCurrentGoogleAccount() {
-        return new Account(mAccountSettings.retrieveGoogleAccount(),
-                "com.google");
+        String name = mAccountSettings.retrieveGoogleAccount();
+        return TextUtils.isEmpty(name) ? null : new Account(name, "com.google");
     }
 
     private PackageInfo getPackageInfo(String packageName) {
@@ -227,9 +227,15 @@ public class BillingServiceBinder extends IBillingService.Stub {
             bundle.putInt("RESPONSE_CODE", packValidate);
             return bundle;
         }
-        String accountName = getCurrentGoogleAccount().name;
-        PurchaseRestService service = new PurchaseService(
-                getCurrentGoogleAccount(), mContext).getRestService();
+
+        Account googleAccount = getCurrentGoogleAccount();
+        if (googleAccount == null) {
+            Log.d(TAG, "User account not configured");
+            bundle.putInt("RESPONSE_CODE",
+                    BillingResponseCodes.RESULT_ERROR);
+            return bundle;
+        }
+        PurchaseRestService service = new PurchaseService(googleAccount, mContext).getRestService();
 
         ArrayList<String> ids = new ArrayList<String>();
         ArrayList<String> data = new ArrayList<String>();
@@ -242,7 +248,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         if (list != null) {
             for (InAppPurchaseDataDto dto : list.getItems()) {
                 ids.add(dto.getId());
@@ -293,8 +299,16 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
+        Account googleAccount = getCurrentGoogleAccount();
+        if (googleAccount == null) {
+            Log.d(TAG, "User account not configured");
+            bundle.putInt("RESPONSE_CODE",
+                    BillingResponseCodes.RESULT_ERROR);
+            return bundle;
+        }
+        
         InventoryRestService service = new InventoryService(
-                getCurrentGoogleAccount(), mContext).getRestService();
+                googleAccount, mContext).getRestService();
 
         ArrayList<String> itemIds = skusBundle
                 .getStringArrayList("ITEM_ID_LIST");
@@ -374,7 +388,11 @@ public class BillingServiceBinder extends IBillingService.Stub {
             String sku, String devPayload) {
 
         Account googleAccount = getCurrentGoogleAccount();
-
+        if (googleAccount == null) {
+            Log.d(TAG, "User account not configured");
+            return null;
+        }
+        
         PurchaseData info = new PurchaseData();
         PackageInfo packageInfo = getPackageInfo(packageName);
         if (packageInfo == null) {

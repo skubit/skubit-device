@@ -193,8 +193,7 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                     @Override
                     public void failure(RetrofitError error) {
                         error.printStackTrace();
-                        showMessage("Failed to make purchase");
-
+                        showMessage("Unable to find the SKU you requested");
                     }
 
                     @Override
@@ -210,7 +209,7 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
         mMain.setVisibility(View.INVISIBLE);
         mLoading.setVisibility(View.VISIBLE);
     }
-    
+
     private void showMessage(String message) {
         mLoading.setVisibility(View.INVISIBLE);
         mMain.setVisibility(View.INVISIBLE);
