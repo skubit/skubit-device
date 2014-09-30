@@ -8,7 +8,6 @@
     android:orientation="vertical"
     android:id="@+id/purchase_activity">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,15 +45,6 @@
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
     </LinearLayout>
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Description"
-        android:id="@+id/description"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.06" />
 
     <Button
         android:id="@+id/purchase_btn"

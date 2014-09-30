@@ -16,6 +16,8 @@
 
 package com.skubit.android;
 
+import java.text.MessageFormat;
+
 import net.skubit.android.R;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -62,8 +64,6 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
 
     private Account mAccount;
 
-    private TextView mDescription;
-
     private InventoryRestService mInventoryService;
 
     private View mLoading;
@@ -85,7 +85,7 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                     @Override
                     public void failure(RetrofitError error) {
                         error.printStackTrace();
-                        hideLoading();
+                        showMessage("Failed to find SKU");
                     }
 
                     @Override
@@ -101,10 +101,9 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                                     .getSatoshi()));
                             mPurchaseBtn.setEnabled(true);
                         }
-                        mTitle.setText(skuDetailsDto.getTitle());
-
-                        mDescription.setText(skuDetailsDto.getDescription());
-
+                        String message = MessageFormat.format("{0} ({1})",
+                                skuDetailsDto.getDescription(), skuDetailsDto.getTitle());
+                        mTitle.setText(message);
                     }
 
                 });
@@ -115,7 +114,6 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
         mPurchaseBtn.setEnabled(false);
         mMain.setVisibility(View.VISIBLE);
         mLoading.setVisibility(View.INVISIBLE);
-
     }
 
     @Override
@@ -140,7 +138,6 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
 
         mTitle = (TextView) findViewById(R.id.title);
         mPrice = (TextView) findViewById(R.id.price);
-        mDescription = (TextView) findViewById(R.id.description);
 
         mPurchaseBtn = (Button) this.findViewById(R.id.purchase_btn);
         mPurchaseBtn.setOnClickListener(new View.OnClickListener() {
@@ -196,15 +193,14 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                     @Override
                     public void failure(RetrofitError error) {
                         error.printStackTrace();
-                        hideLoading();
+                        showMessage("Failed to make purchase");
 
                     }
 
                     @Override
                     public void success(final PurchaseDataDto purchaseDataDto,
                             Response response) {
-                        // TODO: show purchase
-                        hideLoading();
+                        showMessage("Purchase successful");
                     }
 
                 });
@@ -213,5 +209,12 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
     private void showLoading() {
         mMain.setVisibility(View.INVISIBLE);
         mLoading.setVisibility(View.VISIBLE);
+    }
+    
+    private void showMessage(String message) {
+        mLoading.setVisibility(View.INVISIBLE);
+        mMain.setVisibility(View.INVISIBLE);
+        TextView messageView = (TextView) findViewById(R.id.purchase_text);
+        messageView.setText(message);
     }
 }

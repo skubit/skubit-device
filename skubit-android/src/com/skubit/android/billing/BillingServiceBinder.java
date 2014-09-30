@@ -235,17 +235,22 @@ public class BillingServiceBinder extends IBillingService.Stub {
         ArrayList<String> data = new ArrayList<String>();
         ArrayList<String> sigs = new ArrayList<String>();
 
-        InAppPurchaseDataListDto list = service.getPurchaseDatas(packageName,
-                500, 0, continuationToken, true, 0);
+        InAppPurchaseDataListDto list = null;
+        try {
+            list = service.getPurchaseDatas(packageName,
+                    500, 0, continuationToken, true, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
         if (list != null) {
             for (InAppPurchaseDataDto dto : list.getItems()) {
                 ids.add(dto.getId());
                 data.add(dto.getMessage());
                 sigs.add(dto.getSignature());
             }
+            bundle.putString("INAPP_CONTINUATION_TOKEN", list.getNextLink());
         }
-
-        bundle.putString("INAPP_CONTINUATION_TOKEN", list.getNextLink());
 
         bundle.putStringArrayList("INAPP_PURCHASE_ITEM_LIST", ids);
         bundle.putStringArrayList("INAPP_PURCHASE_DATA_LIST", data);
