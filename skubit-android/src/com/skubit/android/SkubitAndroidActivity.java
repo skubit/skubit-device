@@ -108,7 +108,8 @@ public class SkubitAndroidActivity extends Activity implements MainView {
 
             @Override
             public void failure(RetrofitError arg0) {
-                Toast.makeText(SkubitAndroidActivity.this, "Failed to retrieve balance", Toast.LENGTH_SHORT)
+                Toast.makeText(SkubitAndroidActivity.this, "Failed to retrieve balance",
+                        Toast.LENGTH_SHORT)
                         .show();
             }
 

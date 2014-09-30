@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
 package com.skubit.android.services.rest;
 
 import retrofit.Callback;
@@ -24,8 +25,8 @@ import com.skubit.shared.rest.ResourcesPath;
 public interface TransactionRestService {
 
     public static final String baseUri = ResourcesPath.TRANSACTIONS;
-    
+
     @GET(baseUri + "/" + PathParameter.BALANCE)
     void getBalance(Callback<String> balance);
-    
+
 }

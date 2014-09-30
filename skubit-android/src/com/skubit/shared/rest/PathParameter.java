@@ -37,7 +37,7 @@ public class PathParameter {
     public static final String SKUS_LIST = "skus/{application}";
 
     public static final String SKUS_SKUDETAILS = "skus/{application}/{productId}";
-    
+
     public static final String USER_PROFILE = "userProfile";
 
 }

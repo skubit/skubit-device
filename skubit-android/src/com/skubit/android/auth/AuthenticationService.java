@@ -53,7 +53,10 @@ public class AuthenticationService {
             throws UserRecoverableAuthException, IOException,
             GoogleAuthException {
         try {
-            LogInResultDto result = mService.postConnect(true, code);//seem to throw exception here
+            LogInResultDto result = mService.postConnect(true, code);// seem to
+                                                                     // throw
+                                                                     // exception
+                                                                     // here
             AccountSettings.get(mContext).saveBitcoinAddress(
                     result.getCurrentUserDto().getUser().getDepositAddress());
             if (result.getErrorMessage() != null) {
@@ -63,7 +66,7 @@ public class AuthenticationService {
                 return result.getLoggedInCookie();
             }
         } catch (Exception e) {
-            e.printStackTrace();            
+            e.printStackTrace();
             GoogleAuthUtil.invalidateToken(mContext, code);
             return login(account);
 
@@ -99,10 +102,10 @@ public class AuthenticationService {
         return cookie;
     }
 
-    public void signout(final MainView mainView)  {
+    public void signout(final MainView mainView) {
         final AccountSettings accountSettings = AccountSettings.get(mContext);
         final String account = accountSettings.retrieveGoogleAccount();
-        
+
         Thread t = new Thread(new Runnable() {
 
             @Override
@@ -112,20 +115,20 @@ public class AuthenticationService {
                     accountSettings.saveGoogleAccount(null);
                     accountSettings.saveBitcoinAddress(null);
                     mainView.refreshView();
-                    
-                    if(!TextUtils.isEmpty(account)) {
+
+                    if (!TextUtils.isEmpty(account)) {
                         String code = getCode(account);
                         if (!TextUtils.isEmpty(code)) {
                             GoogleAuthUtil.invalidateToken(mContext, code);
-                        }   
-                    }                    
-                   
-                } catch (Exception e ) {
+                        }
+                    }
+
+                } catch (Exception e) {
                     e.printStackTrace();
-                }      
-                
+                }
+
             }
-            
+
         });
         t.start();
     }

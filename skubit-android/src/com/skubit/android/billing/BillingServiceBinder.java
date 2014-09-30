@@ -306,7 +306,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
                     BillingResponseCodes.RESULT_ERROR);
             return bundle;
         }
-        
+
         InventoryRestService service = new InventoryService(
                 googleAccount, mContext).getRestService();
 
@@ -392,7 +392,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
             Log.d(TAG, "User account not configured");
             return null;
         }
-        
+
         PurchaseData info = new PurchaseData();
         PackageInfo packageInfo = getPackageInfo(packageName);
         if (packageInfo == null) {

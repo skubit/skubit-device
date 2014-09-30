@@ -21,7 +21,7 @@ import android.content.Context;
 
 import com.skubit.android.services.rest.PurchaseRestService;
 
-public class PurchaseService extends BaseService<PurchaseRestService>{
+public class PurchaseService extends BaseService<PurchaseRestService> {
 
     public PurchaseService(Account account, Context context) {
         super(account, context);
@@ -31,5 +31,5 @@ public class PurchaseService extends BaseService<PurchaseRestService>{
     public Class<PurchaseRestService> getClazz() {
         return PurchaseRestService.class;
     }
-    
+
 }

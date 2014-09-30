@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
 package com.skubit.android.services.rest;
 
 import retrofit.http.GET;
@@ -27,6 +28,5 @@ public interface AccountsRestService {
 
     @GET(baseUri + "/" + PathParameter.USER_PROFILE)
     UserDto getUserProfile();
-    
 
 }
