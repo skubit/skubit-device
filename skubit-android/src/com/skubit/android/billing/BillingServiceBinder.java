@@ -158,6 +158,10 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
+        if (getCurrentGoogleAccount() == null) {
+            bundle.putInt("RESPONSE_CODE", BillingResponseCodes.RESULT_ERROR);
+            return bundle;
+        }
         /**
          * DO we already own this product? method: userId, packageName,
          * productId bundle.putInt("RESPONSE_CODE",
@@ -389,7 +393,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
 
         Account googleAccount = getCurrentGoogleAccount();
         if (googleAccount == null) {
-            Log.d(TAG, "User account not configured");
+            Log.w(TAG, "User account not configured");
             return null;
         }
 

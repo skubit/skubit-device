@@ -34,6 +34,8 @@ import android.widget.TextView;
 
 import com.skubit.android.billing.BillingResponseCodes;
 import com.skubit.android.billing.PurchaseData;
+import com.skubit.android.currencies.Bitcoin;
+import com.skubit.android.currencies.Satoshi;
 import com.skubit.android.services.InventoryService;
 import com.skubit.android.services.PurchaseService;
 import com.skubit.android.services.rest.InventoryRestService;
@@ -78,6 +80,8 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
     private PurchaseData mPurchaseData;
 
     private TextView mTitle;
+    
+    private TextView mEmail;
 
     @Override
     public void onBackPressed() {
@@ -102,12 +106,38 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                         hideLoading();
                         if (PurchaseDataStatus.COMPLETED.equals(skuDetailsDto
                                 .getPurchaseDataStatus())) {
-                            mPrice.setText("Already Purchased");
-                            mPurchaseBtn.setEnabled(false);
+                            mPrice.setText("Already Purchased");                            
+                            mPurchaseBtn.setText("Close");
+                            mPurchaseBtn.setOnClickListener(new View.OnClickListener() {
+                                
+                                @Override
+                                public void onClick(View v) {
+                                    finish();
+                                }
+                            });
                         } else {
-                            mPrice.setText(String.valueOf(skuDetailsDto
-                                    .getSatoshi()));
-                            mPurchaseBtn.setEnabled(true);
+                            String price = new Bitcoin(new Satoshi(skuDetailsDto.getSatoshi())).getDisplay();
+                            mPrice.setText(price + "BTC");
+                            mPurchaseBtn.setText("BUY");  
+                            mPurchaseBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    showLoading();
+
+                                    Thread t = new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            PurchaseDataDto request = new PurchaseDataDto();
+                                            request.setUserId(mAccount.name);
+                                            request.setDeveloperPayload(mPurchaseData.developerPayload);
+                                            putPurchaseData(request);
+                                            // send developer payload
+                                        }
+
+                                    });
+                                    t.start();
+                                }
+                            });                            
                         }
                         String message = MessageFormat.format("{0} ({1})",
                                 skuDetailsDto.getDescription(), skuDetailsDto.getTitle());
@@ -120,7 +150,6 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
 
     @Override
     public void hideLoading() {
-        mPurchaseBtn.setEnabled(false);
         mMain.setVisibility(View.VISIBLE);
         mLoading.setVisibility(View.INVISIBLE);
     }
@@ -138,58 +167,56 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
         this.setContentView(R.layout.purchase_activity_frame);
         this.mLoading = this.findViewById(R.id.progress_bar);
         this.mMain = this.findViewById(R.id.purchase_activity);
-
+        
+        new FontManager(this);
+        
         mAccount = (Account) this.getIntent().getParcelableExtra(
                 "PurchaseActivity.account");
+        if(mAccount == null) {
+            showMessage("User account has not yet been configured");
+            //TODO: Button should take user to app
+            return;
+        }
 
         mInventoryService = new InventoryService(mAccount, this)
                 .getRestService();
 
         mTitle = (TextView) findViewById(R.id.title);
+        mTitle.setTypeface(FontManager.LITE);
+        
         mPrice = (TextView) findViewById(R.id.price);
-
+        mPrice.setTypeface(FontManager.LITE);
+        
+        mEmail = (TextView) findViewById(R.id.email);
+        if(mAccount != null) {
+            mEmail.setText(mAccount.name);
+            mEmail.setTypeface(FontManager.LITE);
+        }
+                
         mPurchaseBtn = (Button) this.findViewById(R.id.purchase_btn);
-        mPurchaseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showLoading();
-
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        PurchaseDataDto request = new PurchaseDataDto();
-                        request.setUserId(mAccount.name);
-                        request.setDeveloperPayload(mPurchaseData.developerPayload);
-                        putPurchaseData(request);
-                        // send developer payload
-                    }
-
-                });
-                t.start();
-
-            }
-        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        showLoading();
-        byte[] byteArrayExtra = getIntent().getByteArrayExtra(
-                "PurchaseActivity.purchaseData");
-        Parcel parcel = Parcel.obtain();
-        parcel.unmarshall(byteArrayExtra, 0, byteArrayExtra.length);
-        parcel.setDataPosition(0);
-        mPurchaseData = PurchaseData.CREATOR.createFromParcel(parcel);
-        parcel.recycle();
-        Thread t = new Thread(new Runnable() {
+        if(mAccount != null) {
+            showLoading();
+            byte[] byteArrayExtra = getIntent().getByteArrayExtra(
+                    "PurchaseActivity.purchaseData");
+            Parcel parcel = Parcel.obtain();
+            parcel.unmarshall(byteArrayExtra, 0, byteArrayExtra.length);
+            parcel.setDataPosition(0);
+            mPurchaseData = PurchaseData.CREATOR.createFromParcel(parcel);
+            parcel.recycle();
+            Thread t = new Thread(new Runnable() {
 
-            @Override
-            public void run() {
-                getSkuDetails();
-            }
-        });
-        t.start();
+                @Override
+                public void run() {
+                    getSkuDetails();
+                }
+            });
+            t.start();            
+        }
     }
 
     private void putPurchaseData(PurchaseDataDto request) {
@@ -202,7 +229,7 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                     @Override
                     public void failure(RetrofitError error) {
                         error.printStackTrace();
-                        showMessage("Unable to find the SKU you requested");
+                        showMessage("Unable to find the SKU you requested");//seems to throw this with valid purchase
                     }
 
                     @Override
@@ -224,6 +251,7 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
         mLoading.setVisibility(View.INVISIBLE);
         mMain.setVisibility(View.INVISIBLE);
         TextView messageView = (TextView) findViewById(R.id.purchase_text);
+        messageView.setTypeface(FontManager.LITE);
         messageView.setText(message);
     }
 }
