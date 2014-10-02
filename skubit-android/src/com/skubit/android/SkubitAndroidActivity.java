@@ -17,7 +17,7 @@
 package com.skubit.android;
 
 import java.io.IOException;
-import net.skubit.android.R;
+import com.skubit.android.R;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;

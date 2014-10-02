@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.skubit.android"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    package="com.skubit.android"
+    android:versionCode="2"
+    android:versionName="1.1" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -13,10 +13,10 @@
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-    <uses-permission android:name="net.skubit.BILLING" />
+    <uses-permission android:name="com.skubit.BILLING" />
 
     <permission
-        android:name="net.skubit.BILLING"
+        android:name="com.skubit.BILLING"
         android:description="@string/perm_billing"
         android:protectionLevel="normal" />
 
@@ -48,9 +48,9 @@
        
         <service
             android:name="com.skubit.android.billing.BillingService"
-            android:permission="net.skubit.BILLING" >
+            android:permission="com.skubit.BILLING" >
             <intent-filter>
-                <action android:name="net.skubit.android.billing.IBillingService.BIND" />
+                <action android:name="com.skubit.android.billing.IBillingService.BIND" />
             </intent-filter>
         </service>
     </application>

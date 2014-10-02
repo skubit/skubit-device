@@ -18,7 +18,7 @@ package com.skubit.android;
 
 public class Constants {
 
-    public static final boolean IS_PRODUCTION = false;
+    public static final boolean IS_PRODUCTION = true;
 
     public static final String API_SCOPE = "https://www.googleapis.com/auth/plus.login";
 

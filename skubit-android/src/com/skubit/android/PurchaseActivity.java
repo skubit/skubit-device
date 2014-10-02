@@ -18,7 +18,7 @@ package com.skubit.android;
 
 import java.text.MessageFormat;
 
-import net.skubit.android.R;
+import com.skubit.android.R;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -60,8 +60,14 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
 
         intent.putExtra("PurchaseActivity.account", googleAccount);
         intent.putExtra("PurchaseActivity.purchaseData", parcel.marshall());
-        intent.setClassName("net.skubit.android",
-                PurchaseActivity.class.getName());
+        if(Constants.IS_PRODUCTION) {
+            intent.setClassName("com.skubit.android",
+                    PurchaseActivity.class.getName());
+        } else {
+            intent.setClassName("net.skubit.android",
+                    PurchaseActivity.class.getName());            
+        }
+
         return intent;
     }
 
