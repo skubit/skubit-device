@@ -45,12 +45,16 @@ import android.widget.Toast;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.skubit.android.auth.AuthenticationService;
 import com.skubit.android.billing.BillingServiceBinder;
 import com.skubit.android.services.TransactionService;
 
 public class SkubitAndroidActivity extends Activity implements MainView {
 
+    private static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
+    
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private static final String sAboutUrl = "https://catalog.skubit.com/#!/about";
@@ -215,8 +219,13 @@ public class SkubitAndroidActivity extends Activity implements MainView {
                     }
                 }
             });
-        } else if (requestCode == 300 && data != null) {
-
+        } else if (requestCode == REQUEST_CODE_RECOVER_PLAY_SERVICES) {
+            if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Please install Google Play Services.",
+                    Toast.LENGTH_SHORT).show();
+                finish();
+              }
+              return;
         }
     }
 
@@ -290,36 +299,55 @@ public class SkubitAndroidActivity extends Activity implements MainView {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_about:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(sAboutUrl));
-                startActivity(browserIntent);
-                return true;
-            case R.id.action_help:
-                browserIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(sHelpUrl));
-                startActivity(browserIntent);
-                return true;
-            case R.id.action_privacy:
-                browserIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(sPrivacyUrl));
-                startActivity(browserIntent);
-                return true;
-            case R.id.action_signout:
-                new AuthenticationService(this).signout(this);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        Intent browserIntent = null;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_about) {
+            browserIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(sAboutUrl));
+            startActivity(browserIntent);
+            return true;
+        } else if (itemId == R.id.action_help) {
+            browserIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(sHelpUrl));
+            startActivity(browserIntent);
+            return true;
+        } else if (itemId == R.id.action_privacy) {
+            browserIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(sPrivacyUrl));
+            startActivity(browserIntent);
+            return true;
+        } else if (itemId == R.id.action_signout) {
+            new AuthenticationService(this).signout(this);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        refreshView();
+        if(checkPlayServices()) {
+            refreshView();
+        }      
     }
 
+    private boolean checkPlayServices() {
+        int statusCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (statusCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(statusCode)) {
+                GooglePlayServicesUtil.getErrorDialog(statusCode, this,
+                        REQUEST_CODE_RECOVER_PLAY_SERVICES).show();
+            } else {
+                Toast.makeText(this, "This device is not supported.",
+                        Toast.LENGTH_LONG).show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+ 
     public void refreshView() {
         refreshBalance();
         runOnUiThread(new Runnable() {
