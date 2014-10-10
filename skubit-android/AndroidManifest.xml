@@ -38,14 +38,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-       <activity
+        <activity
             android:name="com.skubit.android.PurchaseActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:permission="com.skubit.BILLING"
             android:theme="@style/PurchaseDialog"
-            android:windowSoftInputMode="adjustPan"></activity>
-       
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.skubit.android.DonationActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="com.skubit.BILLING"
+            android:theme="@style/PurchaseDialog"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.skubit.android.ContactInfoActivity"
+            android:label="@string/app_name" >
+        </activity>
+
         <service
             android:name="com.skubit.android.billing.BillingService"
             android:permission="net.skubit.BILLING" >

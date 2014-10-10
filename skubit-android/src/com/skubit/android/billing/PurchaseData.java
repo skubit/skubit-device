@@ -34,6 +34,7 @@ public class PurchaseData implements Parcelable {
             if (parcel.readByte() == 1) {
                 info.developerPayload = parcel.readString();
             }
+            info.type = parcel.readString();
             return info;
         }
 
@@ -55,17 +56,20 @@ public class PurchaseData implements Parcelable {
 
     public int versionCode;
 
+    public String type;
+
     public PurchaseData() {
     }
 
     public PurchaseData(int apiVersion, String packageName, int versionCode,
-            String sku, String signatureHash, String developerPayload) {
+            String sku, String signatureHash, String developerPayload, String type) {
         this.apiVersion = apiVersion;
         this.packageName = packageName;
         this.versionCode = versionCode;
         this.signatureHash = signatureHash;
         this.developerPayload = developerPayload;
         this.sku = sku;
+        this.type = type;
     }
 
     @Override
@@ -92,5 +96,6 @@ public class PurchaseData implements Parcelable {
             parcel.writeByte((byte) 1);
             parcel.writeString(this.developerPayload);
         }
+        parcel.writeString(type);
     }
 }

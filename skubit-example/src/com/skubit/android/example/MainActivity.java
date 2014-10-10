@@ -134,14 +134,15 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public void run() {
 				ArrayList<String> ids = new ArrayList<String>();
-				ids.add("445");
-				ids.add("440");
+				///ids.add("445");
+				//ids.add("440");
+				ids.add("contribA");
 				final Bundle skusBundle = new Bundle();
 				skusBundle.putStringArrayList("ITEM_ID_LIST", ids);
 
 				try {
 					Bundle skuDetails = mService.getSkuDetails(1,
-							getApplicationContext().getPackageName(), "inapp",
+							getApplicationContext().getPackageName(), "donation",
 							skusBundle);
 
 					final ArrayList<String> details = skuDetails
@@ -178,7 +179,7 @@ public class MainActivity extends FragmentActivity {
 		}
 		try {
 			Bundle buyIntent = mService.getBuyIntent(1, getApplicationContext()
-					.getPackageName(), map.get("id"), "inapp",
+					.getPackageName(), map.get("id"), "donation",
 					"developerPayload: " + Math.random());
 			PendingIntent pendingIntent = buyIntent.getParcelable("BUY_INTENT");
 

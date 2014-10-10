@@ -39,6 +39,7 @@ import android.util.Log;
 
 import com.google.common.base.Joiner;
 import com.skubit.android.AccountSettings;
+import com.skubit.android.DonationActivity;
 import com.skubit.android.PurchaseActivity;
 import com.skubit.android.SkubitAndroidActivity;
 import com.skubit.android.services.InventoryService;
@@ -144,7 +145,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
 
         if ((!TextUtils.equals(type, "inapp"))
                 && (!TextUtils.equals(type, "subs"))
-                && (!TextUtils.equals(type, "donate"))) {
+                && (!TextUtils.equals(type, "donation"))) {
             Log.d(TAG, "Incorrect billing type: " + type);
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
@@ -167,8 +168,15 @@ public class BillingServiceBinder extends IBillingService.Stub {
          * productId bundle.putInt("RESPONSE_CODE",
          * BillingResponseCodes.RESULT_ITEM_ALREADY_OWNED)
          */
-        Intent purchaseIntent = makePurchaseIntent(apiVersion, packageName,
-                sku, developerPayload);
+        Intent purchaseIntent = null;
+        if ("donation".equals(type)) {
+            purchaseIntent = makeDonationIntent(apiVersion, packageName, sku, developerPayload,
+                    type);
+        } else {
+            purchaseIntent = makePurchaseIntent(apiVersion, packageName,
+                    sku, developerPayload, type);
+        }
+
         if (purchaseIntent == null) {
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_DEVELOPER_ERROR);
@@ -218,7 +226,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
 
         if ((!TextUtils.equals(type, "inapp"))
                 && (!TextUtils.equals(type, "subs"))
-                && (!TextUtils.equals(type, "donate"))) {
+                && (!TextUtils.equals(type, "donation"))) {
             Log.d(TAG, "Incorrect billing type: " + type);
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
@@ -297,7 +305,8 @@ public class BillingServiceBinder extends IBillingService.Stub {
         }
 
         if ((!TextUtils.equals(type, "inapp"))
-                && (!TextUtils.equals(type, "subs"))) {
+                && (!TextUtils.equals(type, "subs")
+                && (!TextUtils.equals(type, "donation")))) {
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
             return bundle;
@@ -381,7 +390,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
 
         if ((!TextUtils.equals(type, "inapp"))
                 && (!TextUtils.equals(type, "subs"))
-                && (!TextUtils.equals(type, "donate"))) {
+                && (!TextUtils.equals(type, "donation"))) {
             return BillingResponseCodes.RESULT_BILLING_UNAVAILABLE;
         }
 
@@ -389,7 +398,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
     }
 
     public Intent makePurchaseIntent(int apiVersion, String packageName,
-            String sku, String devPayload) {
+            String sku, String devPayload, String type) {
 
         Account googleAccount = getCurrentGoogleAccount();
         if (googleAccount == null) {
@@ -414,7 +423,38 @@ public class BillingServiceBinder extends IBillingService.Stub {
         info.sku = sku;
         info.developerPayload = devPayload;
         info.packageName = packageName;
+        info.type = type;
         return PurchaseActivity.newIntent(googleAccount, info);
+    }
+
+    public Intent makeDonationIntent(int apiVersion, String packageName,
+            String sku, String devPayload, String type) {
+
+        Account googleAccount = getCurrentGoogleAccount();
+        if (googleAccount == null) {
+            Log.w(TAG, "User account not configured");
+            return null;
+        }
+
+        PurchaseData info = new PurchaseData();
+        PackageInfo packageInfo = getPackageInfo(packageName);
+        if (packageInfo == null) {
+            Log.d(TAG, "Package info not found");
+            return null;
+        }
+        if (packageInfo.signatures == null
+                || packageInfo.signatures.length == 0) {
+            Log.d(TAG, "Missing package signature");
+            return null;
+        }
+        info.signatureHash = hash(packageInfo.signatures[0].toByteArray());
+        info.apiVersion = apiVersion;
+        info.versionCode = packageInfo.versionCode;
+        info.sku = sku;
+        info.developerPayload = devPayload;
+        info.packageName = packageName;
+        info.type = type;
+        return DonationActivity.newIntent(googleAccount, info);
     }
 
     private int validatePackageIsOwnedByCaller(String packageName) {

@@ -19,5 +19,5 @@ package com.skubit.shared.dto;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public enum PurchasingType implements IsSerializable {
-    buy_now, donation, subscription
+    buy_now, contribution, donation, subscription
 }

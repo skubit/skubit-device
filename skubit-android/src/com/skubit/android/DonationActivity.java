@@ -1,37 +1,19 @@
-/**
- * Copyright 2014 Skubit
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
 
 package com.skubit.android;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 
-import net.skubit.android.R;
+import org.json.JSONException;
+
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import android.accounts.Account;
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Parcel;
-import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.TextView;
+import retrofit.mime.TypedByteArray;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.skubit.android.billing.BillingResponseCodes;
 import com.skubit.android.billing.PurchaseData;
 import com.skubit.android.currencies.Bitcoin;
@@ -40,11 +22,25 @@ import com.skubit.android.services.InventoryService;
 import com.skubit.android.services.PurchaseService;
 import com.skubit.android.services.rest.InventoryRestService;
 import com.skubit.android.services.rest.PurchaseRestService;
+import com.skubit.shared.dto.ErrorMessage;
 import com.skubit.shared.dto.PurchaseDataDto;
 import com.skubit.shared.dto.PurchaseDataStatus;
+import com.skubit.shared.dto.PurchasingType;
 import com.skubit.shared.dto.SkuDetailsDto;
 
-public final class PurchaseActivity extends Activity implements PurchaseView {
+import net.skubit.android.R;
+import android.accounts.Account;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class DonationActivity extends Activity implements PurchaseView {
 
     static String convertStreamToString(java.io.InputStream is) {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
@@ -61,34 +57,29 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
         intent.putExtra("PurchaseActivity.account", googleAccount);
         intent.putExtra("PurchaseActivity.purchaseData", parcel.marshall());
         intent.setClassName("net.skubit.android",
-                PurchaseActivity.class.getName());
+                DonationActivity.class.getName());
         return intent;
     }
 
     private Account mAccount;
 
+    private TextView mDonationLabel;
+
+    private TextView mEmail;
+
     private InventoryRestService mInventoryService;
+
+    private TextView mAmount;
 
     private View mLoading;
 
     private View mMain;
-
-    private TextView mPrice;
 
     private Button mPurchaseBtn;
 
     private PurchaseData mPurchaseData;
 
     private TextView mTitle;
-
-    private TextView mEmail;
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        setResult(BillingResponseCodes.RESULT_USER_CANCELED,
-                new Intent().putExtra("RESPONSE_CODE", BillingResponseCodes.RESULT_USER_CANCELED));
-    }
 
     private void getSkuDetails() {
         mInventoryService.getSkuDetails(mPurchaseData.packageName,
@@ -104,42 +95,35 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                     public void success(SkuDetailsDto skuDetailsDto,
                             Response response) {
                         hideLoading();
-                        if (PurchaseDataStatus.COMPLETED.equals(skuDetailsDto
-                                .getPurchaseDataStatus())) {
-                            mPrice.setText("Already Purchased");
-                            mPurchaseBtn.setText("Close");
-                            mPurchaseBtn.setOnClickListener(new View.OnClickListener() {
-
-                                @Override
-                                public void onClick(View v) {
-                                    finish();
-                                }
-                            });
+                        final PurchasingType type = skuDetailsDto.getType();
+                        if (type.equals(PurchasingType.contribution)) {
+                            mDonationLabel.setText("Enter Contribution Amount (BTC)");
+                            mPurchaseBtn.setText("DONATE");
                         } else {
-                            String price = new Bitcoin(new Satoshi(skuDetailsDto.getSatoshi()))
-                                    .getDisplay();
-                            mPrice.setText(price + " BTC");
-                            mPurchaseBtn.setText("BUY");
-                            mPurchaseBtn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    showLoading();
-
-                                    Thread t = new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            PurchaseDataDto request = new PurchaseDataDto();
-                                            request.setUserId(mAccount.name);
-                                            request.setDeveloperPayload(mPurchaseData.developerPayload);
-                                            putPurchaseData(request);
-                                            // send developer payload
-                                        }
-
-                                    });
-                                    t.start();
-                                }
-                            });
+                            mDonationLabel.setText("Enter Donation Amount (BTC)");
+                            mPurchaseBtn.setText("DONATE");
                         }
+                        mPurchaseBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                showLoading();
+
+                                Thread t = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        PurchaseDataDto request = new PurchaseDataDto();
+                                        request.setUserId(mAccount.name);
+                                        request.setDeveloperPayload(mPurchaseData.developerPayload);
+                                        request.setPurchasingType(type);
+                                        putPurchaseData(request);
+                                        // send developer payload
+                                    }
+
+                                });
+                                t.start();
+                            }
+                        });
+
                         String message = MessageFormat.format("{0} ({1})",
                                 skuDetailsDto.getDescription(), skuDetailsDto.getTitle());
                         mTitle.setText(message);
@@ -156,18 +140,22 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+    public void onBackPressed() {
+        super.onBackPressed();
+        setResult(BillingResponseCodes.RESULT_USER_CANCELED,
+                new Intent().putExtra("RESPONSE_CODE", BillingResponseCodes.RESULT_USER_CANCELED));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.donation_activity_frame);
 
-        this.setContentView(R.layout.purchase_activity_frame);
         this.mLoading = this.findViewById(R.id.progress_bar);
         this.mMain = this.findViewById(R.id.purchase_activity);
+        this.mDonationLabel = (TextView) findViewById(R.id.donationLabel);
+        this.mAmount = (EditText) findViewById(R.id.amount);
 
         new FontManager(this);
 
@@ -184,9 +172,6 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
 
         mTitle = (TextView) findViewById(R.id.title);
         mTitle.setTypeface(FontManager.LITE);
-
-        mPrice = (TextView) findViewById(R.id.price);
-        mPrice.setTypeface(FontManager.LITE);
 
         mEmail = (TextView) findViewById(R.id.email);
         if (mAccount != null) {
@@ -223,26 +208,34 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
     private void putPurchaseData(PurchaseDataDto request) {
         PurchaseRestService service = new PurchaseService(mAccount, this)
                 .getRestService();
-
+        Satoshi satoshi = new Satoshi(new Bitcoin(mAmount.getText().toString()));
+        request.setSatoshi(satoshi.getValueAsLong());
         service.postPurchaseData(mPurchaseData.packageName, mPurchaseData.sku,
                 request, new Callback<PurchaseDataDto>() {
 
                     @Override
                     public void failure(RetrofitError error) {
                         error.printStackTrace();
-                        showMessage("Unable to find the SKU you requested");// seems
-                                                                            // to
-                                                                            // throw
-                                                                            // this
-                                                                            // with
-                                                                            // valid
-                                                                            // purchase
+                        String json = new String(((TypedByteArray) error.getResponse().getBody())
+                                .getBytes());
+                        ErrorMessage message = new Gson().fromJson(json, ErrorMessage.class);
+
+                        // ErrorMessage message = ;//(ErrorMessage)
+                        // error.getBodyAs(ErrorMessage.class);
+                        int responseCode = message.getCode();
+                        if (message.getCode() == 9000) {
+                            showMessage("Insufficient funds");
+                        } else if (responseCode == 9001) {
+                            showMessage("Missing contact info");
+                        } else if (responseCode == 9002) {
+                            showMessage("Invalid request");
+                        }
                     }
 
                     @Override
                     public void success(final PurchaseDataDto purchaseDataDto,
                             Response response) {
-                        showMessage("Purchase successful");
+                        showMessage("Donation successful. Thank you.");
                         setResult(0, new Intent().putExtra("RESPONSE_CODE", 0));
                     }
 
@@ -261,4 +254,5 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
         messageView.setTypeface(FontManager.LITE);
         messageView.setText(message);
     }
+
 }

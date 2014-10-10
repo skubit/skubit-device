@@ -30,7 +30,7 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.skubit.android.AccountSettings;
 import com.skubit.android.Constants;
-import com.skubit.android.MainView;
+import com.skubit.android.SettingsView;
 import com.skubit.android.services.rest.AuthenticationRestService;
 import com.skubit.shared.dto.LogInResultDto;
 
@@ -102,7 +102,7 @@ public class AuthenticationService {
         return cookie;
     }
 
-    public void signout(final MainView mainView) {
+    public void signout(final SettingsView mainView) {
         final AccountSettings accountSettings = AccountSettings.get(mContext);
         final String account = accountSettings.retrieveGoogleAccount();
 
