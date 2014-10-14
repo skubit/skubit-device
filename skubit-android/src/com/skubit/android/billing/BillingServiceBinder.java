@@ -143,9 +143,11 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
-        if ((!TextUtils.equals(type, "inapp"))
-                && (!TextUtils.equals(type, "subs"))
-                && (!TextUtils.equals(type, "donation"))) {
+        if (!TextUtils.equals(type, "inapp")
+                && !TextUtils.equals(type, "subs")
+                && !TextUtils.equals(type, "donation")
+                && !TextUtils.equals(type, "contribution")
+                && !TextUtils.equals(type, "gift")) {
             Log.d(TAG, "Incorrect billing type: " + type);
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
@@ -169,7 +171,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
          * BillingResponseCodes.RESULT_ITEM_ALREADY_OWNED)
          */
         Intent purchaseIntent = null;
-        if ("donation".equals(type)) {
+        if ("donation".equals(type) || "gift".equals(type) || "contribution".equals(type)) {
             purchaseIntent = makeDonationIntent(apiVersion, packageName, sku, developerPayload,
                     type);
         } else {
@@ -182,7 +184,8 @@ public class BillingServiceBinder extends IBillingService.Stub {
                     BillingResponseCodes.RESULT_DEVELOPER_ERROR);
             return bundle;
         }
-        PendingIntent pending = PendingIntent.getActivity(mContext, 0,
+        PendingIntent pending = PendingIntent.getActivity(mContext,
+                (sku + mAccountSettings.retrieveGoogleAccount()).hashCode(),
                 purchaseIntent, 0);
         bundle.putParcelable("BUY_INTENT", pending);
 
@@ -224,9 +227,11 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
-        if ((!TextUtils.equals(type, "inapp"))
-                && (!TextUtils.equals(type, "subs"))
-                && (!TextUtils.equals(type, "donation"))) {
+        if (!TextUtils.equals(type, "inapp")
+                && !TextUtils.equals(type, "subs")
+                && !TextUtils.equals(type, "donation")
+                && !TextUtils.equals(type, "contribution")
+                && !TextUtils.equals(type, "gift")) {
             Log.d(TAG, "Incorrect billing type: " + type);
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
@@ -304,9 +309,11 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
-        if ((!TextUtils.equals(type, "inapp"))
-                && (!TextUtils.equals(type, "subs")
-                && (!TextUtils.equals(type, "donation")))) {
+        if (!TextUtils.equals(type, "inapp")
+                && !TextUtils.equals(type, "subs")
+                && !TextUtils.equals(type, "donation")
+                && !TextUtils.equals(type, "contribution")
+                && !TextUtils.equals(type, "gift")) {
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
             return bundle;
@@ -388,9 +395,11 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return packValidate;
         }
 
-        if ((!TextUtils.equals(type, "inapp"))
-                && (!TextUtils.equals(type, "subs"))
-                && (!TextUtils.equals(type, "donation"))) {
+        if (!TextUtils.equals(type, "inapp")
+                && !TextUtils.equals(type, "subs")
+                && !TextUtils.equals(type, "donation")
+                && !TextUtils.equals(type, "contribution")
+                && !TextUtils.equals(type, "gift")) {
             return BillingResponseCodes.RESULT_BILLING_UNAVAILABLE;
         }
 
@@ -424,7 +433,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
         info.developerPayload = devPayload;
         info.packageName = packageName;
         info.type = type;
-        return PurchaseActivity.newIntent(googleAccount, info);
+        return PurchaseActivity.newIntent(googleAccount, info, mContext.getPackageName());
     }
 
     public Intent makeDonationIntent(int apiVersion, String packageName,
@@ -454,7 +463,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
         info.developerPayload = devPayload;
         info.packageName = packageName;
         info.type = type;
-        return DonationActivity.newIntent(googleAccount, info);
+        return DonationActivity.newIntent(googleAccount, info, mContext.getPackageName());
     }
 
     private int validatePackageIsOwnedByCaller(String packageName) {

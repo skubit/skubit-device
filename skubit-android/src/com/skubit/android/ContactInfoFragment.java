@@ -109,40 +109,34 @@ public class ContactInfoFragment extends Fragment {
 
         });
 
-        mCancelButton = (Button) view.findViewById(R.id.cancelBtn);
-        mCancelButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // finish();
-            }
-        });
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mAccountsService.getUserProfile(new Callback<UserDto>() {
+        if(mAccountsService != null) {
+            mAccountsService.getUserProfile(new Callback<UserDto>() {
 
-            @Override
-            public void failure(RetrofitError error) {
-                error.printStackTrace();
-            }
+                @Override
+                public void failure(RetrofitError error) {
+                    error.printStackTrace();
+                }
 
-            @Override
-            public void success(UserDto userDto, Response arg1) {
-                 mCity.setText(userDto.getCity());
-                 mEmployer.setText(userDto.getEmployer());
-                 mFullName.setText(userDto.getFullName());
-                 mOccupation.setText(userDto.getOccuption());
-                 mState.setText(userDto.getState());
-                 mAddress1.setText(userDto.getStreetAddress1());
-                 mAddress2.setText(userDto.getStreetAddress2());
-                 mZip.setText(userDto.getZipCode());
-            }
-            
-        });
+                @Override
+                public void success(UserDto userDto, Response arg1) {
+                     mCity.setText(userDto.getCity());
+                     mEmployer.setText(userDto.getEmployer());
+                     mFullName.setText(userDto.getFullName());
+                     mOccupation.setText(userDto.getOccuption());
+                     mState.setText(userDto.getState());
+                     mAddress1.setText(userDto.getStreetAddress1());
+                     mAddress2.setText(userDto.getStreetAddress2());
+                     mZip.setText(userDto.getZipCode());
+                }
+                
+            });           
+        }
     }
 
     private void showMessage(String message) {

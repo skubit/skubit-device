@@ -275,7 +275,7 @@ public class SkubitAndroidActivity extends Activity {
                     Uri.parse(sHelpUrl));
             startActivity(browserIntent);
         } else if (position == 5) {
-            // new AuthenticationService(this).signout(mSettingsView);
+             new AuthenticationService(this).signout();
         }
 
         mDrawerList.setItemChecked(position, true);

@@ -53,16 +53,6 @@ public class SkuDetailsDto implements Dto {
 
     private String vendorId;
 
-    private boolean isQualified;
-
-    public boolean isQualified() {
-        return isQualified;
-    }
-
-    public void setQualified(boolean isQualified) {
-        this.isQualified = isQualified;
-    }
-
     public String getApplication() {
         return application;
     }

@@ -22,8 +22,8 @@ import net.skubit.android.R;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 import android.accounts.Account;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -32,26 +32,20 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.skubit.android.billing.BillingResponseCodes;
+import com.google.gson.Gson;
 import com.skubit.android.billing.PurchaseData;
 import com.skubit.android.currencies.Bitcoin;
 import com.skubit.android.currencies.Satoshi;
-import com.skubit.android.services.InventoryService;
 import com.skubit.android.services.PurchaseService;
-import com.skubit.android.services.rest.InventoryRestService;
 import com.skubit.android.services.rest.PurchaseRestService;
+import com.skubit.shared.dto.ErrorMessage;
 import com.skubit.shared.dto.PurchaseDataDto;
 import com.skubit.shared.dto.PurchaseDataStatus;
 import com.skubit.shared.dto.SkuDetailsDto;
 
-public final class PurchaseActivity extends Activity implements PurchaseView {
+public final class PurchaseActivity extends BasePurchaseActivity {
 
-    static String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
-
-    public static Intent newIntent(Account googleAccount, PurchaseData data) {
+    public static Intent newIntent(Account googleAccount, PurchaseData data, String packageName) {
         Intent intent = new Intent(data.sku);
 
         Parcel parcel = Parcel.obtain();
@@ -60,37 +54,15 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
 
         intent.putExtra("PurchaseActivity.account", googleAccount);
         intent.putExtra("PurchaseActivity.purchaseData", parcel.marshall());
-        intent.setClassName("net.skubit.android",
+        intent.setClassName(packageName,
                 PurchaseActivity.class.getName());
         return intent;
     }
 
-    private Account mAccount;
-
-    private InventoryRestService mInventoryService;
-
-    private View mLoading;
-
-    private View mMain;
-
     private TextView mPrice;
 
-    private Button mPurchaseBtn;
-
-    private PurchaseData mPurchaseData;
-
-    private TextView mTitle;
-
-    private TextView mEmail;
-
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        setResult(BillingResponseCodes.RESULT_USER_CANCELED,
-                new Intent().putExtra("RESPONSE_CODE", BillingResponseCodes.RESULT_USER_CANCELED));
-    }
-
-    private void getSkuDetails() {
+    protected void getSkuDetails() {
         mInventoryService.getSkuDetails(mPurchaseData.packageName,
                 mPurchaseData.sku, new Callback<SkuDetailsDto>() {
 
@@ -150,77 +122,22 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
     }
 
     @Override
-    public void hideLoading() {
-        mMain.setVisibility(View.VISIBLE);
-        mLoading.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         this.setContentView(R.layout.purchase_activity_frame);
-        this.mLoading = this.findViewById(R.id.progress_bar);
-        this.mMain = this.findViewById(R.id.purchase_activity);
-
-        new FontManager(this);
-
-        mAccount = (Account) this.getIntent().getParcelableExtra(
-                "PurchaseActivity.account");
-        if (mAccount == null) {
-            showMessage("User account has not yet been configured");
-            // TODO: Button should take user to app
-            return;
-        }
-
-        mInventoryService = new InventoryService(mAccount, this)
-                .getRestService();
-
-        mTitle = (TextView) findViewById(R.id.title);
-        mTitle.setTypeface(FontManager.LITE);
+        super.onCreate(savedInstanceState);
 
         mPrice = (TextView) findViewById(R.id.price);
         mPrice.setTypeface(FontManager.LITE);
-
-        mEmail = (TextView) findViewById(R.id.email);
-        if (mAccount != null) {
-            mEmail.setText(mAccount.name);
-            mEmail.setTypeface(FontManager.LITE);
-        }
-
-        mPurchaseBtn = (Button) this.findViewById(R.id.purchase_btn);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (mAccount != null) {
-            showLoading();
-            byte[] byteArrayExtra = getIntent().getByteArrayExtra(
-                    "PurchaseActivity.purchaseData");
-            Parcel parcel = Parcel.obtain();
-            parcel.unmarshall(byteArrayExtra, 0, byteArrayExtra.length);
-            parcel.setDataPosition(0);
-            mPurchaseData = PurchaseData.CREATOR.createFromParcel(parcel);
-            parcel.recycle();
-            Thread t = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    getSkuDetails();
-                }
-            });
-            t.start();
-        }
-    }
-
-    private void putPurchaseData(PurchaseDataDto request) {
+    protected void putPurchaseData(PurchaseDataDto request) {
         PurchaseRestService service = new PurchaseService(mAccount, this)
                 .getRestService();
 
@@ -230,13 +147,18 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                     @Override
                     public void failure(RetrofitError error) {
                         error.printStackTrace();
-                        showMessage("Unable to find the SKU you requested");// seems
-                                                                            // to
-                                                                            // throw
-                                                                            // this
-                                                                            // with
-                                                                            // valid
-                                                                            // purchase
+                        String json = new String(((TypedByteArray) error.getResponse().getBody())
+                                .getBytes());
+                        ErrorMessage message = new Gson().fromJson(json, ErrorMessage.class);
+
+                        int responseCode = message.getCode();
+                        if (message.getCode() == 9000) {
+                            showMessage("Insufficient funds");
+                        } else if (responseCode == 9001) {
+                            showMessage("Missing contact info");
+                        } else if (responseCode == 9002) {
+                            showMessage("Invalid request");
+                        }
                     }
 
                     @Override
@@ -249,16 +171,4 @@ public final class PurchaseActivity extends Activity implements PurchaseView {
                 });
     }
 
-    private void showLoading() {
-        mMain.setVisibility(View.INVISIBLE);
-        mLoading.setVisibility(View.VISIBLE);
-    }
-
-    private void showMessage(String message) {
-        mLoading.setVisibility(View.INVISIBLE);
-        mMain.setVisibility(View.INVISIBLE);
-        TextView messageView = (TextView) findViewById(R.id.purchase_text);
-        messageView.setTypeface(FontManager.LITE);
-        messageView.setText(message);
-    }
 }

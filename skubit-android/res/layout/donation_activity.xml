@@ -28,7 +28,7 @@
             android:textSize="@dimen/text_medium" />
 
         <TextView
-            android:id="@+id/donationLabel"
+            android:id="@+id/purchaseLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
