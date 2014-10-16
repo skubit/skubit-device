@@ -51,7 +51,7 @@ public class ContactInfoFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.contact_info_fragment, null);
@@ -115,7 +115,7 @@ public class ContactInfoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(mAccountsService != null) {
+        if (mAccountsService != null) {
             mAccountsService.getUserProfile(new Callback<UserDto>() {
 
                 @Override
@@ -125,17 +125,17 @@ public class ContactInfoFragment extends Fragment {
 
                 @Override
                 public void success(UserDto userDto, Response arg1) {
-                     mCity.setText(userDto.getCity());
-                     mEmployer.setText(userDto.getEmployer());
-                     mFullName.setText(userDto.getFullName());
-                     mOccupation.setText(userDto.getOccuption());
-                     mState.setText(userDto.getState());
-                     mAddress1.setText(userDto.getStreetAddress1());
-                     mAddress2.setText(userDto.getStreetAddress2());
-                     mZip.setText(userDto.getZipCode());
+                    mCity.setText(userDto.getCity());
+                    mEmployer.setText(userDto.getEmployer());
+                    mFullName.setText(userDto.getFullName());
+                    mOccupation.setText(userDto.getOccuption());
+                    mState.setText(userDto.getState());
+                    mAddress1.setText(userDto.getStreetAddress1());
+                    mAddress2.setText(userDto.getStreetAddress2());
+                    mZip.setText(userDto.getZipCode());
                 }
-                
-            });           
+
+            });
         }
     }
 
@@ -143,5 +143,4 @@ public class ContactInfoFragment extends Fragment {
         Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
     }
 
-    
 }

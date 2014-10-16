@@ -138,6 +138,7 @@ public class SettingsFragment extends Fragment implements SettingsView {
     public void refreshBalance() {
         String account = mAccountSettings.retrieveGoogleAccount();
         if (TextUtils.isEmpty(account)) {
+            this.mBalance.setText("Loading");
             return;
         }
         TransactionService transactionService = new TransactionService(new Account(account,
@@ -158,7 +159,7 @@ public class SettingsFragment extends Fragment implements SettingsView {
 
         });
     }
-   
+
     @Override
     public void onPause() {
         super.onPause();

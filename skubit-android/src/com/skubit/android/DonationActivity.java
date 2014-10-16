@@ -62,10 +62,10 @@ public class DonationActivity extends BasePurchaseActivity {
                         if (type.equals(PurchasingType.contribution)) {
                             mPurchaseLabel.setText("Enter Contribution Amount (BTC)");
                             mPurchaseBtn.setText("DONATE");
-                        } else if(type.equals(PurchasingType.donation)){
+                        } else if (type.equals(PurchasingType.donation)) {
                             mPurchaseLabel.setText("Enter Donation Amount (BTC)");
                             mPurchaseBtn.setText("DONATE");
-                        } else if(type.equals(PurchasingType.gift)){
+                        } else if (type.equals(PurchasingType.gift)) {
                             mPurchaseLabel.setText("Enter Gift Amount (BTC)");
                             mPurchaseBtn.setText("GIFT");
                         }
@@ -98,14 +98,14 @@ public class DonationActivity extends BasePurchaseActivity {
 
                 });
     }
-    
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {    
+    protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.donation_activity_frame);
         super.onCreate(savedInstanceState);
     }
-    
+
     @Override
     protected void putPurchaseData(PurchaseDataDto request) {
         PurchaseRestService service = new PurchaseService(mAccount, this)

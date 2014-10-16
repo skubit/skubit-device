@@ -143,22 +143,20 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
-        if (!TextUtils.equals(type, "inapp")
-                && !TextUtils.equals(type, "subs")
-                && !TextUtils.equals(type, "donation")
-                && !TextUtils.equals(type, "contribution")
-                && !TextUtils.equals(type, "gift")) {
+        if (!isValidType(type)) {
             Log.d(TAG, "Incorrect billing type: " + type);
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
             return bundle;
         }
 
-        int packValidate = validatePackageIsOwnedByCaller(packageName);
-        if (packValidate != BillingResponseCodes.RESULT_OK) {
-            Log.d(TAG, "Package is not owned by caller");
-            bundle.putInt("RESPONSE_CODE", packValidate);
-            return bundle;
+        if (!isDonationType(type)) {
+            int packValidate = validatePackageIsOwnedByCaller(packageName);
+            if (packValidate != BillingResponseCodes.RESULT_OK) {
+                Log.d(TAG, "Package is not owned by caller");
+                bundle.putInt("RESPONSE_CODE", packValidate);
+                return bundle;
+            }
         }
 
         if (getCurrentGoogleAccount() == null) {
@@ -227,22 +225,20 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
-        if (!TextUtils.equals(type, "inapp")
-                && !TextUtils.equals(type, "subs")
-                && !TextUtils.equals(type, "donation")
-                && !TextUtils.equals(type, "contribution")
-                && !TextUtils.equals(type, "gift")) {
+        if (!isValidType(type)) {
             Log.d(TAG, "Incorrect billing type: " + type);
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
             return bundle;
         }
 
-        int packValidate = validatePackageIsOwnedByCaller(packageName);
-        if (packValidate != BillingResponseCodes.RESULT_OK) {
-            Log.d(TAG, "Package is not owned by caller");
-            bundle.putInt("RESPONSE_CODE", packValidate);
-            return bundle;
+        if (!isDonationType(type)) {
+            int packValidate = validatePackageIsOwnedByCaller(packageName);
+            if (packValidate != BillingResponseCodes.RESULT_OK) {
+                Log.d(TAG, "Package is not owned by caller");
+                bundle.putInt("RESPONSE_CODE", packValidate);
+                return bundle;
+            }
         }
 
         Account googleAccount = getCurrentGoogleAccount();
@@ -303,20 +299,18 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
-        int packValidate = validatePackageIsOwnedByCaller(packageName);
-        if (packValidate != BillingResponseCodes.RESULT_OK) {
-            bundle.putInt("RESPONSE_CODE", packValidate);
-            return bundle;
-        }
-
-        if (!TextUtils.equals(type, "inapp")
-                && !TextUtils.equals(type, "subs")
-                && !TextUtils.equals(type, "donation")
-                && !TextUtils.equals(type, "contribution")
-                && !TextUtils.equals(type, "gift")) {
+        if (!isValidType(type)) {
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
             return bundle;
+        }
+
+        if (!isDonationType(type)) {
+            int packValidate = validatePackageIsOwnedByCaller(packageName);
+            if (packValidate != BillingResponseCodes.RESULT_OK) {
+                bundle.putInt("RESPONSE_CODE", packValidate);
+                return bundle;
+            }
         }
 
         Account googleAccount = getCurrentGoogleAccount();
@@ -389,18 +383,16 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return BillingResponseCodes.RESULT_BILLING_UNAVAILABLE;
         }
 
-        int packValidate = validatePackageIsOwnedByCaller(packageName);
-        if (packValidate != BillingResponseCodes.RESULT_OK) {
-            Log.d(TAG, "Package is not owned by caller");
-            return packValidate;
+        if (!isValidType(type)) {
+            return BillingResponseCodes.RESULT_BILLING_UNAVAILABLE;
         }
 
-        if (!TextUtils.equals(type, "inapp")
-                && !TextUtils.equals(type, "subs")
-                && !TextUtils.equals(type, "donation")
-                && !TextUtils.equals(type, "contribution")
-                && !TextUtils.equals(type, "gift")) {
-            return BillingResponseCodes.RESULT_BILLING_UNAVAILABLE;
+        if (!isDonationType(type)) {
+            int packValidate = validatePackageIsOwnedByCaller(packageName);
+            if (packValidate != BillingResponseCodes.RESULT_OK) {
+                Log.d(TAG, "Package is not owned by caller");
+                return packValidate;
+            }
         }
 
         return BillingResponseCodes.RESULT_OK;
@@ -477,5 +469,17 @@ public class BillingServiceBinder extends IBillingService.Stub {
             }
         }
         return BillingResponseCodes.RESULT_DEVELOPER_ERROR;
+    }
+
+    private boolean isValidType(String type) {
+        return TextUtils.equals(type, "inapp")
+                || TextUtils.equals(type, "subs")
+                || isDonationType(type);
+    }
+
+    private boolean isDonationType(String type) {
+        return TextUtils.equals(type, "donation")
+                || TextUtils.equals(type, "contribution")
+                || TextUtils.equals(type, "gift");
     }
 }

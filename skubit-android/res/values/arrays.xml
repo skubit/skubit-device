@@ -3,6 +3,7 @@
 
     <string-array name="drawer_items">
         <item>Account</item>
+        <item>Circles</item>
         <item>Donation Info</item>
         <item>About</item>
         <item>Privacy</item>

@@ -75,7 +75,6 @@ public abstract class BasePurchaseActivity extends Activity implements PurchaseV
                 new Intent().putExtra("RESPONSE_CODE", BillingResponseCodes.RESULT_USER_CANCELED));
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,7 +116,7 @@ public abstract class BasePurchaseActivity extends Activity implements PurchaseV
 
             @Override
             public void onClick(View v) {
-                //hideMessage();
+                // hideMessage();
                 finish();
             }
         });
@@ -154,7 +153,7 @@ public abstract class BasePurchaseActivity extends Activity implements PurchaseV
         mPurchaseMessage.setVisibility(View.INVISIBLE);
         mLoading.setVisibility(View.VISIBLE);
     }
-    
+
     public void showMessage(String message) {
         mLoading.setVisibility(View.INVISIBLE);
         mMain.setVisibility(View.INVISIBLE);
