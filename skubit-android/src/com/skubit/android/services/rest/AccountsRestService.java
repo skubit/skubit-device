@@ -16,7 +16,10 @@
 
 package com.skubit.android.services.rest;
 
+import retrofit.Callback;
+import retrofit.http.Body;
 import retrofit.http.GET;
+import retrofit.http.PUT;
 
 import com.skubit.shared.dto.UserDto;
 import com.skubit.shared.rest.PathParameter;
@@ -27,6 +30,10 @@ public interface AccountsRestService {
     public static final String baseUri = ResourcesPath.ACCOUNTS;
 
     @GET(baseUri + "/" + PathParameter.USER_PROFILE)
-    UserDto getUserProfile();
+    void getUserProfile(Callback<UserDto> currentUserDto);
+
+    @PUT(baseUri + "/" + PathParameter.USER_PROFILE)
+    void putUserProfile(@Body
+    UserDto userProfileDto, Callback<Void> result);
 
 }

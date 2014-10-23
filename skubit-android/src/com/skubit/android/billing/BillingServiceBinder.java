@@ -39,8 +39,9 @@ import android.util.Log;
 
 import com.google.common.base.Joiner;
 import com.skubit.android.AccountSettings;
-import com.skubit.android.PurchaseActivity;
 import com.skubit.android.SkubitAndroidActivity;
+import com.skubit.android.purchases.DonationActivity;
+import com.skubit.android.purchases.PurchaseActivity;
 import com.skubit.android.services.InventoryService;
 import com.skubit.android.services.PurchaseService;
 import com.skubit.android.services.rest.InventoryRestService;
@@ -142,20 +143,20 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
-        if ((!TextUtils.equals(type, "inapp"))
-                && (!TextUtils.equals(type, "subs"))
-                && (!TextUtils.equals(type, "donate"))) {
+        if (!isValidType(type)) {
             Log.d(TAG, "Incorrect billing type: " + type);
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
             return bundle;
         }
 
-        int packValidate = validatePackageIsOwnedByCaller(packageName);
-        if (packValidate != BillingResponseCodes.RESULT_OK) {
-            Log.d(TAG, "Package is not owned by caller");
-            bundle.putInt("RESPONSE_CODE", packValidate);
-            return bundle;
+        if (!isDonationType(type)) {
+            int packValidate = validatePackageIsOwnedByCaller(packageName);
+            if (packValidate != BillingResponseCodes.RESULT_OK) {
+                Log.d(TAG, "Package is not owned by caller");
+                bundle.putInt("RESPONSE_CODE", packValidate);
+                return bundle;
+            }
         }
 
         if (getCurrentGoogleAccount() == null) {
@@ -167,14 +168,22 @@ public class BillingServiceBinder extends IBillingService.Stub {
          * productId bundle.putInt("RESPONSE_CODE",
          * BillingResponseCodes.RESULT_ITEM_ALREADY_OWNED)
          */
-        Intent purchaseIntent = makePurchaseIntent(apiVersion, packageName,
-                sku, developerPayload);
+        Intent purchaseIntent = null;
+        if ("donation".equals(type) || "gift".equals(type) || "contribution".equals(type)) {
+            purchaseIntent = makeDonationIntent(apiVersion, packageName, sku, developerPayload,
+                    type);
+        } else {
+            purchaseIntent = makePurchaseIntent(apiVersion, packageName,
+                    sku, developerPayload, type);
+        }
+
         if (purchaseIntent == null) {
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_DEVELOPER_ERROR);
             return bundle;
         }
-        PendingIntent pending = PendingIntent.getActivity(mContext, 0,
+        PendingIntent pending = PendingIntent.getActivity(mContext,
+                (sku + mAccountSettings.retrieveGoogleAccount()).hashCode(),
                 purchaseIntent, 0);
         bundle.putParcelable("BUY_INTENT", pending);
 
@@ -216,20 +225,20 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
-        if ((!TextUtils.equals(type, "inapp"))
-                && (!TextUtils.equals(type, "subs"))
-                && (!TextUtils.equals(type, "donate"))) {
+        if (!isValidType(type)) {
             Log.d(TAG, "Incorrect billing type: " + type);
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
             return bundle;
         }
 
-        int packValidate = validatePackageIsOwnedByCaller(packageName);
-        if (packValidate != BillingResponseCodes.RESULT_OK) {
-            Log.d(TAG, "Package is not owned by caller");
-            bundle.putInt("RESPONSE_CODE", packValidate);
-            return bundle;
+        if (!isDonationType(type)) {
+            int packValidate = validatePackageIsOwnedByCaller(packageName);
+            if (packValidate != BillingResponseCodes.RESULT_OK) {
+                Log.d(TAG, "Package is not owned by caller");
+                bundle.putInt("RESPONSE_CODE", packValidate);
+                return bundle;
+            }
         }
 
         Account googleAccount = getCurrentGoogleAccount();
@@ -290,17 +299,18 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
 
-        int packValidate = validatePackageIsOwnedByCaller(packageName);
-        if (packValidate != BillingResponseCodes.RESULT_OK) {
-            bundle.putInt("RESPONSE_CODE", packValidate);
-            return bundle;
-        }
-
-        if ((!TextUtils.equals(type, "inapp"))
-                && (!TextUtils.equals(type, "subs"))) {
+        if (!isValidType(type)) {
             bundle.putInt("RESPONSE_CODE",
                     BillingResponseCodes.RESULT_BILLING_UNAVAILABLE);
             return bundle;
+        }
+
+        if (!isDonationType(type)) {
+            int packValidate = validatePackageIsOwnedByCaller(packageName);
+            if (packValidate != BillingResponseCodes.RESULT_OK) {
+                bundle.putInt("RESPONSE_CODE", packValidate);
+                return bundle;
+            }
         }
 
         Account googleAccount = getCurrentGoogleAccount();
@@ -373,23 +383,23 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return BillingResponseCodes.RESULT_BILLING_UNAVAILABLE;
         }
 
-        int packValidate = validatePackageIsOwnedByCaller(packageName);
-        if (packValidate != BillingResponseCodes.RESULT_OK) {
-            Log.d(TAG, "Package is not owned by caller");
-            return packValidate;
+        if (!isValidType(type)) {
+            return BillingResponseCodes.RESULT_BILLING_UNAVAILABLE;
         }
 
-        if ((!TextUtils.equals(type, "inapp"))
-                && (!TextUtils.equals(type, "subs"))
-                && (!TextUtils.equals(type, "donate"))) {
-            return BillingResponseCodes.RESULT_BILLING_UNAVAILABLE;
+        if (!isDonationType(type)) {
+            int packValidate = validatePackageIsOwnedByCaller(packageName);
+            if (packValidate != BillingResponseCodes.RESULT_OK) {
+                Log.d(TAG, "Package is not owned by caller");
+                return packValidate;
+            }
         }
 
         return BillingResponseCodes.RESULT_OK;
     }
 
     public Intent makePurchaseIntent(int apiVersion, String packageName,
-            String sku, String devPayload) {
+            String sku, String devPayload, String type) {
 
         Account googleAccount = getCurrentGoogleAccount();
         if (googleAccount == null) {
@@ -414,7 +424,38 @@ public class BillingServiceBinder extends IBillingService.Stub {
         info.sku = sku;
         info.developerPayload = devPayload;
         info.packageName = packageName;
-        return PurchaseActivity.newIntent(googleAccount, info);
+        info.type = type;
+        return PurchaseActivity.newIntent(googleAccount, info, mContext.getPackageName());
+    }
+
+    public Intent makeDonationIntent(int apiVersion, String packageName,
+            String sku, String devPayload, String type) {
+
+        Account googleAccount = getCurrentGoogleAccount();
+        if (googleAccount == null) {
+            Log.w(TAG, "User account not configured");
+            return null;
+        }
+
+        PurchaseData info = new PurchaseData();
+        PackageInfo packageInfo = getPackageInfo(packageName);
+        if (packageInfo == null) {
+            Log.d(TAG, "Package info not found");
+            return null;
+        }
+        if (packageInfo.signatures == null
+                || packageInfo.signatures.length == 0) {
+            Log.d(TAG, "Missing package signature");
+            return null;
+        }
+        info.signatureHash = hash(packageInfo.signatures[0].toByteArray());
+        info.apiVersion = apiVersion;
+        info.versionCode = packageInfo.versionCode;
+        info.sku = sku;
+        info.developerPayload = devPayload;
+        info.packageName = packageName;
+        info.type = type;
+        return DonationActivity.newIntent(googleAccount, info, mContext.getPackageName());
     }
 
     private int validatePackageIsOwnedByCaller(String packageName) {
@@ -428,5 +469,17 @@ public class BillingServiceBinder extends IBillingService.Stub {
             }
         }
         return BillingResponseCodes.RESULT_DEVELOPER_ERROR;
+    }
+
+    private boolean isValidType(String type) {
+        return TextUtils.equals(type, "inapp")
+                || TextUtils.equals(type, "subs")
+                || isDonationType(type);
+    }
+
+    private boolean isDonationType(String type) {
+        return TextUtils.equals(type, "donation")
+                || TextUtils.equals(type, "contribution")
+                || TextUtils.equals(type, "gift");
     }
 }

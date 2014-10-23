@@ -25,7 +25,7 @@ public class Constants {
     public static final String CLIENT_ID = IS_PRODUCTION ? "266284506512-sg6hcfm7pkhjn3d1g50n312qipid90qo.apps.googleusercontent.com"
             : "832605197626-8aiat1apv6v6329b9kjha0p02hcl9q81.apps.googleusercontent.com";
 
-    public static final boolean LOG_LEVEL_FULL = false;
+    public static final boolean LOG_LEVEL_FULL = !IS_PRODUCTION;
 
     public static final String SHARED_PREFERENCE = "com.skubit.shared";
 

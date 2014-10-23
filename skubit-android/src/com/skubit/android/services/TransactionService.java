@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
 package com.skubit.android.services;
 
 import android.accounts.Account;
@@ -20,7 +21,7 @@ import android.content.Context;
 
 import com.skubit.android.services.rest.TransactionRestService;
 
-public class TransactionService extends BaseService<TransactionRestService>{
+public class TransactionService extends BaseService<TransactionRestService> {
 
     public TransactionService(Account account, Context context) {
         super(account, context);

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="75dp"
+        style="@style/AccountDrawerItem"
+        android:background="@drawable/radialback"
+        >
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/icon"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/google_icon"
+        android:layout_centerVertical="true"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NickName"
+        android:id="@+id/account_nickname"
+        android:textSize="@dimen/text_medium"
+        android:layout_toRightOf="@+id/icon"
+        android:layout_alignTop="@+id/icon"/>
+
+    <TextView
+        android:id="@+id/account_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_small"
+        android:text="email"
+        android:layout_alignLeft="@+id/account_nickname"
+        android:layout_alignBottom="@+id/icon"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/expander"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"/>
+
+
+</RelativeLayout>

@@ -22,6 +22,8 @@ import retrofit.RestAdapter;
 import retrofit.RestAdapter.LogLevel;
 import retrofit.converter.JacksonConverter;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -30,7 +32,8 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.skubit.android.AccountSettings;
 import com.skubit.android.Constants;
-import com.skubit.android.MainView;
+import com.skubit.android.SettingsView;
+import com.skubit.android.SkubitAndroidActivity;
 import com.skubit.android.services.rest.AuthenticationRestService;
 import com.skubit.shared.dto.LogInResultDto;
 
@@ -44,7 +47,9 @@ public class AuthenticationService {
         final RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(Constants.SKUBIT_AUTH)
                 .setConverter(new JacksonConverter()).build();
-        restAdapter.setLogLevel(LogLevel.FULL);
+        if (Constants.LOG_LEVEL_FULL) {
+            restAdapter.setLogLevel(LogLevel.FULL);
+        }
         mService = restAdapter.create(AuthenticationRestService.class);
         this.mContext = context;
     }
@@ -102,7 +107,7 @@ public class AuthenticationService {
         return cookie;
     }
 
-    public void signout(final MainView mainView) {
+    public void signout() {
         final AccountSettings accountSettings = AccountSettings.get(mContext);
         final String account = accountSettings.retrieveGoogleAccount();
 
@@ -114,12 +119,14 @@ public class AuthenticationService {
                     accountSettings.saveCookie(null);
                     accountSettings.saveGoogleAccount(null);
                     accountSettings.saveBitcoinAddress(null);
-                    mainView.refreshView();
+                    LocalBroadcastManager.getInstance(mContext)
+                            .sendBroadcast(new Intent("account"));
 
                     if (!TextUtils.isEmpty(account)) {
                         String code = getCode(account);
                         if (!TextUtils.isEmpty(code)) {
                             GoogleAuthUtil.invalidateToken(mContext, code);
+
                         }
                     }
 

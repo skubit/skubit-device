@@ -26,6 +26,8 @@ public class AccountSettings {
     private static final String COOKIE = "cookie";
 
     private static final String GOOGLE_ACCOUNT = "googleAccount";
+    
+    private static final String INDEX = "index";
 
     private static volatile AccountSettings sInstance = null;
 
@@ -46,6 +48,10 @@ public class AccountSettings {
         this.context = context;
     }
 
+    public int getCurrentIndex() {
+        return retrieveIntPreference(INDEX);
+    }
+
     public String retrieveBitcoinAddress() {
         return retrieveStringPreference(BITCOIN_ADDRESS);
     }
@@ -53,9 +59,15 @@ public class AccountSettings {
     public String retrieveCookie() {
         return retrieveStringPreference(COOKIE);
     }
-
+    
     public String retrieveGoogleAccount() {
         return retrieveStringPreference(GOOGLE_ACCOUNT);
+    }
+    
+    private int retrieveIntPreference(String key) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(
+                Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE);
+        return sharedPreferences.getInt(key, 0);
     }
 
     private String retrieveStringPreference(String key) {
@@ -63,7 +75,7 @@ public class AccountSettings {
                 Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE);
         return sharedPreferences.getString(key, null);
     }
-
+    
     public void saveBitcoinAddress(String address) {
         saveStringPreference(BITCOIN_ADDRESS, address);
     }
@@ -76,11 +88,23 @@ public class AccountSettings {
         saveStringPreference(GOOGLE_ACCOUNT, googleAccount);
     }
 
+    private void saveIntPreference(String key, int value) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(
+                Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(key, value);
+        editor.commit();
+    }
+
     private void saveStringPreference(String key, String value) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(
                 Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(key, value);
         editor.commit();
+    }
+    
+    public void setCurrentIndex(int index) {
+        saveIntPreference(INDEX, index);
     }
 }

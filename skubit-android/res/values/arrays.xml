@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="drawer_items">
+        <item>Account</item>
+        <item>Transactions</item>
+        <item>People</item>
+        <item>Donation Info</item>
+        
+        <item>Share</item>
+        <item>About</item>
+        <item>Privacy</item>
+        <item>Help</item>       
+        <item>Sign Out</item>
+    </string-array>
+
+</resources>
