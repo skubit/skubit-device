@@ -21,6 +21,7 @@
         android:protectionLevel="normal" />
 
     <application
+        android:name="com.skubit.android.SkubitApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -32,14 +33,14 @@
         <activity
             android:name="com.skubit.android.SkubitAndroidActivity"
             android:label="@string/app_name" >
-                        <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.skubit.android.PurchaseActivity"
+            android:name="com.skubit.android.purchases.PurchaseActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:permission="com.skubit.BILLING"
@@ -47,7 +48,7 @@
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
-            android:name="com.skubit.android.DonationActivity"
+            android:name="com.skubit.android.purchases.DonationActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:permission="com.skubit.BILLING"
@@ -58,7 +59,16 @@
             android:name="com.skubit.android.ContactInfoActivity"
             android:label="@string/app_name" >
         </activity>
-
+        <activity
+            android:name="com.skubit.android.people.TransferMoneyActivity"
+            android:label="@string/app_name" 
+            android:theme="@style/PurchaseDialog"
+            android:windowSoftInputMode="adjustPan">
+        </activity>        
+        <activity
+            android:name="com.skubit.android.transactions.TransactionDetailsActivity"
+            android:label="@string/app_name" >
+        </activity>
         <service
             android:name="com.skubit.android.billing.BillingService"
             android:permission="net.skubit.BILLING" >

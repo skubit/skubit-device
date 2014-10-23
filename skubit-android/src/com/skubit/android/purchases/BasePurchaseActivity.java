@@ -1,5 +1,5 @@
 
-package com.skubit.android;
+package com.skubit.android.purchases;
 
 import net.skubit.android.R;
 import android.accounts.Account;
@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.skubit.android.FontManager;
 import com.skubit.android.billing.BillingResponseCodes;
 import com.skubit.android.billing.PurchaseData;
 import com.skubit.android.services.InventoryService;
@@ -84,7 +85,6 @@ public abstract class BasePurchaseActivity extends Activity implements PurchaseV
         this.mPurchaseMessage = (LinearLayout) this.findViewById(R.id.purchase_message);
 
         mPurchaseMessage.setVisibility(View.INVISIBLE);
-        new FontManager(this);
 
         mAccount = (Account) this.getIntent().getParcelableExtra(
                 "PurchaseActivity.account");

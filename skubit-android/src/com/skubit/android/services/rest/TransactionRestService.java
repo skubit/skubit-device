@@ -17,8 +17,16 @@
 package com.skubit.android.services.rest;
 
 import retrofit.Callback;
+import retrofit.http.Body;
 import retrofit.http.GET;
+import retrofit.http.Headers;
+import retrofit.http.POST;
+import retrofit.http.Path;
+import retrofit.http.Query;
 
+import com.skubit.shared.dto.TransactionDto;
+import com.skubit.shared.dto.TransactionsListDto;
+import com.skubit.shared.dto.UserDto;
 import com.skubit.shared.rest.PathParameter;
 import com.skubit.shared.rest.ResourcesPath;
 
@@ -28,5 +36,20 @@ public interface TransactionRestService {
 
     @GET(baseUri + "/" + PathParameter.BALANCE)
     void getBalance(Callback<String> balance);
+    
+    @Headers("Content-Type: application/json")
+    @GET(baseUri + "/activity")
+    void getTransactions(
+            @Query("limit")
+            int limit,
+            @Query("offset")
+            int offset,
+            @Query("cursor")
+            String cursor, Callback<TransactionsListDto> transactionsListDto);
+
+    @Headers("Content-Type: application/json")
+    @POST(baseUri + "/transfer/{amount}")
+    void makeTransfer(@Path("amount") String amount,
+            @Body UserDto toUserDto, Callback<TransactionDto> response);
 
 }

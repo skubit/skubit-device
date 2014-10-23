@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.skubit.android;
+package com.skubit.android.purchases;
 
 import java.text.MessageFormat;
 
@@ -33,6 +33,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.skubit.android.FontManager;
 import com.skubit.android.billing.PurchaseData;
 import com.skubit.android.currencies.Bitcoin;
 import com.skubit.android.currencies.Satoshi;

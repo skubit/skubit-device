@@ -39,9 +39,9 @@ import android.util.Log;
 
 import com.google.common.base.Joiner;
 import com.skubit.android.AccountSettings;
-import com.skubit.android.DonationActivity;
-import com.skubit.android.PurchaseActivity;
 import com.skubit.android.SkubitAndroidActivity;
+import com.skubit.android.purchases.DonationActivity;
+import com.skubit.android.purchases.PurchaseActivity;
 import com.skubit.android.services.InventoryService;
 import com.skubit.android.services.PurchaseService;
 import com.skubit.android.services.rest.InventoryRestService;

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.skubit.android;
+package com.skubit.android.purchases;
 
 public interface PurchaseView {
 

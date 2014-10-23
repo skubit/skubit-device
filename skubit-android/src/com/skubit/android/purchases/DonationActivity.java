@@ -1,5 +1,5 @@
 
-package com.skubit.android;
+package com.skubit.android.purchases;
 
 import java.text.MessageFormat;
 
