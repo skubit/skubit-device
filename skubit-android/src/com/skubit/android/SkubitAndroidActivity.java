@@ -17,6 +17,7 @@
 package com.skubit.android;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import com.skubit.android.R;
 import android.accounts.AccountManager;
@@ -28,6 +29,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender.SendIntentException;
 import android.content.pm.ActivityInfo;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -39,6 +41,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +68,9 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
 import com.skubit.android.auth.AuthenticationService;
 import com.skubit.android.billing.BillingServiceBinder;
+import com.skubit.android.osl.DisplayLicensesActivity;
 import com.skubit.android.people.PeopleFragment;
+import com.skubit.android.qr.QrCodeActivity;
 import com.skubit.android.transactions.TransactionsFragment;
 
 public class SkubitAndroidActivity extends Activity implements
@@ -92,8 +98,6 @@ public class SkubitAndroidActivity extends Activity implements
     private static final String TAG = "PLUS";
 
     private AccountSettings mAccountSettings;
-    
-    private int mCurrentPosition;
 
     private BroadcastReceiver mAccountSignout = new BroadcastReceiver() {
         @Override
@@ -105,6 +109,8 @@ public class SkubitAndroidActivity extends Activity implements
     };
 
     protected BillingServiceBinder mBinder;
+
+    private int mCurrentPosition;
 
     private DrawerAdapter mDrawerAdapter;
 
@@ -422,18 +428,36 @@ public class SkubitAndroidActivity extends Activity implements
         if (savedInstanceState != null) {
             fragment = getFragmentManager().findFragmentByTag("settings");
         } else {
-            fragment = new SettingsFragment();
+            fragment = new AccountSettingsFragment();
             getFragmentManager().beginTransaction().add(R.id.main_container, fragment, "settings")
                     .commit();
         }
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int order = item.getOrder();
+        if (order == 0) {
+            if (mDrawerToggle.onOptionsItemSelected(item)) {
+                return true;
+            }
+        } else if (order == 1) {
+            Intent i = new Intent();
+            i.setClass(this, QrCodeActivity.class);
+            startActivity(i);
+        } else if (order == 2) {
+            Intent i = new Intent();
+            i.setClass(this, DisplayLicensesActivity.class);
+            startActivity(i);
+            
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -459,7 +483,7 @@ public class SkubitAndroidActivity extends Activity implements
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-        
+
         unlockOrientation();
         LocalBroadcastManager.getInstance(this).registerReceiver(mAccountSignout,
                 new IntentFilter("signout"));
@@ -480,7 +504,7 @@ public class SkubitAndroidActivity extends Activity implements
         if (checkPlayServices()) {
             connectToGoogleApi();
             selectItem(mAccountSettings.getCurrentIndex());
-        }       
+        }
     }
 
     @Override
@@ -513,21 +537,21 @@ public class SkubitAndroidActivity extends Activity implements
 
     private void selectItem(int position) {
         Intent browserIntent = null;
-        if(position < 4) {
-           this.mCurrentPosition = position;
+        if (position < 4) {
+            this.mCurrentPosition = position;
         }
-        
+
         if (position == 0) {
-            replaceFragmentFor("settings", new SettingsFragment());
-        }
-        else if (position == 1) {
             replaceFragmentFor("transactions", new TransactionsFragment());
         }
-        else if (position == 2) {
+        else if (position == 1) {
             replaceFragmentFor("circles", new PeopleFragment());
         }
-        else if (position == 3) {
+        else if (position == 2) {
             replaceFragmentFor("contact", new ContactInfoFragment());
+        }
+        else if (position == 3) {
+            replaceFragmentFor("settings", new AccountSettingsFragment());
         }
         else if (position == 4) {
             PlusShare.Builder builder = new PlusShare.Builder(this);
@@ -536,8 +560,8 @@ public class SkubitAndroidActivity extends Activity implements
                     null);
             builder.setContentUrl(Uri
                     .parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
-            builder.setText("Check out the Skubit app: in-app purchases with Bitcoin");     
-           
+            builder.setText("Check out the Skubit app: in-app purchases with Bitcoin");
+
             try {
                 Intent shareIntent = builder.getIntent();
                 startActivityForResult(shareIntent, 10000);
@@ -566,7 +590,7 @@ public class SkubitAndroidActivity extends Activity implements
             signoutOfGooglePlusAndConnect();
             signoutOfSkubit();
             position = 0;
-            replaceFragmentFor("settings", new SettingsFragment());
+            replaceFragmentFor("settings", new AccountSettingsFragment());
         }
         if (position < 4) {
             mDrawerAdapter.setBoldPosition(position);
@@ -616,4 +640,5 @@ public class SkubitAndroidActivity extends Activity implements
         Log.d(TAG, "Unlock Orientation");
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     }
+   
 }

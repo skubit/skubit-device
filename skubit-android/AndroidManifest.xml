@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+
     package="com.skubit.android"
-    android:versionCode="4"
-    android:versionName="1.3" >
+    android:versionCode="5"
+    android:versionName="1.4" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -40,12 +41,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.skubit.android.purchases.PurchaseActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:permission="com.skubit.BILLING"
-            android:theme="@style/PurchaseDialog"
-            android:windowSoftInputMode="adjustPan" >
+            android:name="com.skubit.android.ContactInfoActivity"
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name="com.skubit.android.purchases.DonationActivity"
@@ -56,19 +53,38 @@
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
-            android:name="com.skubit.android.ContactInfoActivity"
-            android:label="@string/app_name" >
+            android:name="com.skubit.android.osl.DisplayLicensesActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/LicenseDialog"
+            android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
-            android:name="com.skubit.android.people.TransferMoneyActivity"
-            android:label="@string/app_name" 
+            android:name="com.skubit.android.purchases.PurchaseActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="com.skubit.BILLING"
             android:theme="@style/PurchaseDialog"
-            android:windowSoftInputMode="adjustPan">
-        </activity>        
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.skubit.android.qr.QrCodeActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/PurchaseDialog"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
         <activity
             android:name="com.skubit.android.transactions.TransactionDetailsActivity"
             android:label="@string/app_name" >
         </activity>
+        <activity
+            android:name="com.skubit.android.people.TransferMoneyActivity"
+            android:label="@string/app_name"
+            android:theme="@style/PurchaseDialog"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+
         <service
             android:name="com.skubit.android.billing.BillingService"
             android:permission="com.skubit.BILLING" >

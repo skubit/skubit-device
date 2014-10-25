@@ -10,6 +10,7 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.google.android.gms.plus.PlusShare;
 import com.google.gson.Gson;
 import com.skubit.android.AccountSettings;
+import com.skubit.android.Constants;
 import com.skubit.android.FontManager;
 import com.skubit.android.SkubitApplication;
 import com.skubit.android.billing.PurchaseData;
@@ -98,7 +99,7 @@ public class TransferMoneyActivity extends Activity {
 
         mToId = (String) getIntent().getStringExtra("TransferMoneyActivity.toId");
         mToName = (String) getIntent().getStringExtra("TransferMoneyActivity.toName");
-        
+
         String imageUrl = getIntent().hasExtra("TransferMoneyActivity.imageUrl") ? (String) getIntent()
                 .getStringExtra("TransferMoneyActivity.imageUrl")
                 : null;
@@ -125,7 +126,7 @@ public class TransferMoneyActivity extends Activity {
         mPurchaseBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onClick(View v) {               
+            public void onClick(View v) {
                 if (!isNumeric(mAmount.getText().toString())) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -143,9 +144,9 @@ public class TransferMoneyActivity extends Activity {
                 UserDto toUser = new UserDto();
                 toUser.setFullName(mToName);
                 toUser.setSubject(mToId);
-                
+
                 mTransactionService.getRestService().makeTransfer(mAmount.getText().toString(),
-                       toUser, new Callback<TransactionDto>() {
+                        toUser, new Callback<TransactionDto>() {
 
                             @Override
                             public void failure(RetrofitError error) {
@@ -185,12 +186,14 @@ public class TransferMoneyActivity extends Activity {
             @Override
             public void onClick(View v) {
                 PlusShare.Builder builder = new PlusShare.Builder(TransferMoneyActivity.this);
+                String url = (Constants.IS_PRODUCTION) ? "https://catalog.skubit.com"
+                        : "https://catalog.skubit.net";
+
                 builder.addCallToAction("GIFT",
-                        Uri.parse("https://catalog.skubit.net"),// TODO - per
-                                                                // env
+                        Uri.parse(url),
                         null);
                 builder.setContentUrl(Uri
-                        .parse("https://catalog.skubit.net"));
+                        .parse(url));
                 builder.setText("I sent you a gift of BTC: " + mAmount.getText().toString());
 
                 try {

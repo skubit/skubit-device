@@ -69,9 +69,15 @@ public class TransactionsFragment extends Fragment {
     private TransactionService mTransactionService;
 
     public void getTransactions() {
-        if(mTransactionService == null) {
+        String account = mAccountSettings.retrieveGoogleAccount();
+        if (!TextUtils.isEmpty(account)) {
+            mTransactionService = new TransactionService(new Account(account,
+                    "com.google"), getActivity());
+            refreshBalance();
+        } else {
             return;
-        }
+        }  
+
         mTransactionService.getRestService().getTransactions(500, 0, null,
                 new Callback<TransactionsListDto>() {
 
@@ -155,7 +161,7 @@ public class TransactionsFragment extends Fragment {
 
     public void refreshBalance() {
         String account = mAccountSettings.retrieveGoogleAccount();
-        if (TextUtils.isEmpty(account)) {
+        if (TextUtils.isEmpty(account) || mTransactionService == null) {
             this.mBalance.setText("Loading");
             return;
         }

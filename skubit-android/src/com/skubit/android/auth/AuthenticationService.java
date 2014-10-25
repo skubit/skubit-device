@@ -32,8 +32,6 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.skubit.android.AccountSettings;
 import com.skubit.android.Constants;
-import com.skubit.android.SettingsView;
-import com.skubit.android.SkubitAndroidActivity;
 import com.skubit.android.services.rest.AuthenticationRestService;
 import com.skubit.shared.dto.LogInResultDto;
 

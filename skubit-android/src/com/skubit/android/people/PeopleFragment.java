@@ -35,26 +35,33 @@ public class PeopleFragment extends Fragment implements ResultCallback<People.Lo
 
     private PeopleAdapter mPeopleAdapter;
 
+    private GridView mGridView;
+
+    private AccountSettings mAccountSettings;
+
+    private SkubitApplication mSkubitApplication;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SkubitApplication skubitApplication = (SkubitApplication) this.getActivity()
+        mSkubitApplication = (SkubitApplication) this.getActivity()
                 .getApplication();
 
-        AccountSettings mAccountSettings = AccountSettings.get(getActivity());
+        mAccountSettings = AccountSettings.get(getActivity());
 
         String account = mAccountSettings.retrieveGoogleAccount();
-        
-        mPeopleAdapter = new PeopleAdapter(this.getActivity(), skubitApplication.getImageLoader(),
-                new Account(account, "com.google"));
+
+        if(!TextUtils.isEmpty(account)) {
+            mPeopleAdapter = new PeopleAdapter(this.getActivity(), mSkubitApplication.getImageLoader(),
+                    new Account(account, "com.google"));            
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.people_fragment, null);
-        GridView gc = (GridView) view.findViewById(R.id.gridview);
-        gc.setAdapter(mPeopleAdapter);
+        mGridView = (GridView) view.findViewById(R.id.gridview);
         return view;
     }
 
@@ -91,6 +98,17 @@ public class PeopleFragment extends Fragment implements ResultCallback<People.Lo
     @Override
     public void onResume() {
         super.onResume();
+        if(mPeopleAdapter == null) {
+            String account = mAccountSettings.retrieveGoogleAccount();
+            if(!TextUtils.isEmpty(account)) {
+                mPeopleAdapter = new PeopleAdapter(this.getActivity(), mSkubitApplication.getImageLoader(),
+                        new Account(account, "com.google"));            
+            } else {
+                return;
+            }
+        }
+        mGridView.setAdapter(mPeopleAdapter);
+        
         mGoogleApiClient = ((SkubitAndroidActivity) this.getActivity()).getGoogleApiClient();
         Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mAccountChangeReceiver,
