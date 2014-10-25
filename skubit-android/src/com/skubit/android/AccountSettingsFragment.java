@@ -1,18 +1,4 @@
-/**
- * Copyright 2014 Skubit
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
+
 package com.skubit.android;
 
 import net.skubit.android.R;
@@ -21,7 +7,12 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import android.accounts.Account;
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,35 +21,28 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.skubit.android.billing.BillingServiceBinder;
 import com.skubit.android.services.AccountsService;
 import com.skubit.android.services.rest.AccountsRestService;
 import com.skubit.shared.dto.UserDto;
 
-public class ContactInfoFragment extends Fragment {
+public class AccountSettingsFragment extends Fragment {
 
+    private BroadcastReceiver mAccountChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            refreshView();
+        }
+    };
     private AccountSettings mAccountSettings;
-
     private AccountsRestService mAccountsService;
-
-    private EditText mAddress1;
-
-    private EditText mAddress2;
-
-    private Button mCancelButton;
-
-    private EditText mCity;
-
-    private EditText mEmployer;
-
+    protected BillingServiceBinder mBinder;
+    private EditText mEmail;
     private EditText mFullName;
-
-    private EditText mOccupation;
-
+    private EditText mPayout;
     private Button mSaveButton;
 
-    private EditText mState;
-
-    private EditText mZip;
+    private EditText mWebsite;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,8 +52,7 @@ public class ContactInfoFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.contact_info_fragment, null);
-
+        View view = inflater.inflate(R.layout.settings_fragment, null);
         mAccountSettings = AccountSettings.get(getActivity());
         String account = mAccountSettings.retrieveGoogleAccount();
         if (TextUtils.isEmpty(account)) {
@@ -77,14 +60,10 @@ public class ContactInfoFragment extends Fragment {
             return view;
         }
 
-        mAddress1 = (EditText) view.findViewById(R.id.address1);
-        mAddress2 = (EditText) view.findViewById(R.id.address2);
-        mCity = (EditText) view.findViewById(R.id.city);
-        mEmployer = (EditText) view.findViewById(R.id.employer);
         mFullName = (EditText) view.findViewById(R.id.fullName);
-        mOccupation = (EditText) view.findViewById(R.id.occupation);
-        mState = (EditText) view.findViewById(R.id.state);
-        mZip = (EditText) view.findViewById(R.id.zip);
+        mEmail = (EditText) view.findViewById(R.id.contactEmail);
+        mWebsite = (EditText) view.findViewById(R.id.website);
+        mPayout = (EditText) view.findViewById(R.id.payout);
 
         mAccountsService = new AccountsService(new Account(account, "com.google"), getActivity())
                 .getRestService();
@@ -96,14 +75,10 @@ public class ContactInfoFragment extends Fragment {
             public void onClick(View v) {
 
                 UserDto userDto = new UserDto();
-                userDto.setCity(mCity.getText().toString());
-                userDto.setEmployer(mEmployer.getText().toString());
                 userDto.setFullName(mFullName.getText().toString());
-                userDto.setOccuption(mOccupation.getText().toString());
-                userDto.setState(mState.getText().toString());
-                userDto.setStreetAddress1(mAddress1.getText().toString());
-                userDto.setStreetAddress2(mAddress2.getText().toString());
-                userDto.setZipCode(mZip.getText().toString());
+                userDto.setContactWebsite(mWebsite.getText().toString());
+                userDto.setEmail(mEmail.getText().toString());
+                userDto.setPayoutAddress(mPayout.getText().toString());
 
                 mAccountsService.putUserProfile(userDto, new Callback<Void>() {
 
@@ -126,8 +101,33 @@ public class ContactInfoFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mAccountChangeReceiver);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
+        refreshView();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mAccountChangeReceiver,
+                new IntentFilter("account"));
+    }
+
+    public void refreshView() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                updateContact();
+            }
+        });
+    }
+
+    private void showMessage(String message) {
+        Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+    }
+
+    private void updateContact() {
         if (mAccountsService != null) {
             mAccountsService.getUserProfile(new Callback<UserDto>() {
 
@@ -138,22 +138,14 @@ public class ContactInfoFragment extends Fragment {
 
                 @Override
                 public void success(UserDto userDto, Response arg1) {
-                    mCity.setText(userDto.getCity());
-                    mEmployer.setText(userDto.getEmployer());
                     mFullName.setText(userDto.getFullName());
-                    mOccupation.setText(userDto.getOccuption());
-                    mState.setText(userDto.getState());
-                    mAddress1.setText(userDto.getStreetAddress1());
-                    mAddress2.setText(userDto.getStreetAddress2());
-                    mZip.setText(userDto.getZipCode());
+                    mWebsite.setText(userDto.getContactWebsite());
+                    mEmail.setText(userDto.getEmail());
+                    mPayout.setText(userDto.getPayoutAddress());
                 }
 
             });
         }
-    }
-
-    private void showMessage(String message) {
-        Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
     }
 
 }
