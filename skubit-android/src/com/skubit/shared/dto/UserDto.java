@@ -12,8 +12,6 @@ public class UserDto implements Dto {
 
     private String contactWebsite;
 
-    private String depositAddress;
-
     private String email;
 
     private String employer;
@@ -57,10 +55,6 @@ public class UserDto implements Dto {
 
     public String getContactWebsite() {
         return contactWebsite;
-    }
-
-    public String getDepositAddress() {
-        return depositAddress;
     }
 
     public String getEmail() {
@@ -123,10 +117,6 @@ public class UserDto implements Dto {
         this.contactWebsite = contactWebsite;
     }
 
-    public void setDepositAddress(String depositAddress) {
-        this.depositAddress = depositAddress;
-    }
-
     public void setEmail(String email) {
         this.email = email;
     }
@@ -181,8 +171,8 @@ public class UserDto implements Dto {
 
     @Override
     public String toString() {
-        return "UserDto [city=" + city + ", contactWebsite=" + contactWebsite
-                + ", depositAddress=" + depositAddress + ", email=" + email
+        return "UserDto [city=" + city + ", contactWebsite=" + contactWebsite 
+                + ", email=" + email
                 + ", employer=" + employer + ", fullName=" + fullName
                 + ", logoutUrl=" + logoutUrl + ", occuption=" + occuption
                 + ", payoutAddress=" + payoutAddress + ", state=" + state

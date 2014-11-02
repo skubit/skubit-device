@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Skubit</string>
+    <string name="app_name">Skubit Wallet</string>
 
     <string name="action_settings">Settings</string>
     <string name="account_wallet">Skubit Wallet</string>
@@ -19,5 +19,8 @@
     <string name="transactions_refresh_error">Could not sync transactions.</string>
     <string name="wallet_balance_label">CURRENT BALANCE</string>
     <string name="wallet_balance_def">-.----</string>
+
+    <!-- zxing -->
+    <string name="barcode_scan_message">Place a Bitcoin barcode inside the\nviewfinder to scan it.</string>
 
 </resources>

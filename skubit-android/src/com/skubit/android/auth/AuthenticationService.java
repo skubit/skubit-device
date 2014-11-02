@@ -20,28 +20,35 @@ import java.io.IOException;
 
 import retrofit.RestAdapter;
 import retrofit.RestAdapter.LogLevel;
+import retrofit.RetrofitError;
 import retrofit.converter.JacksonConverter;
-import android.content.Context;
+import retrofit.mime.TypedByteArray;
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.skubit.android.AccountSettings;
 import com.skubit.android.Constants;
 import com.skubit.android.services.rest.AuthenticationRestService;
+import com.skubit.shared.ResponseCodes;
+import com.skubit.shared.dto.ErrorMessage;
 import com.skubit.shared.dto.LogInResultDto;
 
 public class AuthenticationService {
 
     private static AuthenticationRestService mService;
 
-    private Context mContext;
+    private Activity mContext;
 
-    public AuthenticationService(Context context) {
+    public AuthenticationService(Activity context) {
         final RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(Constants.SKUBIT_AUTH)
                 .setConverter(new JacksonConverter()).build();
@@ -60,19 +67,46 @@ public class AuthenticationService {
                                                                      // throw
                                                                      // exception
                                                                      // here
-            AccountSettings.get(mContext).saveBitcoinAddress(
-                    result.getCurrentUserDto().getUser().getDepositAddress());
+          //  AccountSettings.get(mContext).saveBitcoinAddress(
+          //          result.getCurrentUserDto().getUser().getDepositAddress());
             if (result.getErrorMessage() != null) {
                 Log.d("skubit", "skubit: "
                         + result.getErrorMessage().getMessage());
             } else {
                 return result.getLoggedInCookie();
             }
+        } catch (RetrofitError error) {
+            String json = new String(((TypedByteArray) error.getResponse().getBody())
+                    .getBytes());
+
+            ErrorMessage message;
+            try {
+                message = new Gson().fromJson(json, ErrorMessage.class);
+            } catch (JsonSyntaxException e) {
+                showMessage("Unknown login exception");
+                GoogleAuthUtil.invalidateToken(mContext, code);
+                return null;
+            }
+
+            int responseCode = message.getCode();
+            if (message.getCode() == ResponseCodes.FAILED_CREDENTIALS) {
+                showMessage("Failed credentials");
+                GoogleAuthUtil.invalidateToken(mContext, code);
+            } else if (responseCode ==  ResponseCodes.FAILED_TO_ADD_TEST_MONEY) {
+                showMessage("Failed to add test money");
+            } else if (responseCode ==  ResponseCodes.FAILED_TO_OBTAIN_TOKEN) {
+                showMessage("Failed to obtain token");
+                GoogleAuthUtil.invalidateToken(mContext, code);
+            } else {
+                showMessage("Unknown login exception");
+                GoogleAuthUtil.invalidateToken(mContext, code);
+            }
+            error.printStackTrace();
         } catch (Exception e) {
+            showMessage("Unknown login exception");
             e.printStackTrace();
             GoogleAuthUtil.invalidateToken(mContext, code);
             return login(account);
-
         }
         return null;
     }
@@ -103,6 +137,16 @@ public class AuthenticationService {
         String cookie = exchangeCodeForCookie(account, code);
         AccountSettings.get(mContext).saveCookie(cookie);
         return cookie;
+    }
+
+    private void showMessage(final String message) {
+        mContext.runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+       
+
     }
 
     public void signout() {

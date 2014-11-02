@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-
     package="com.skubit.android"
-    android:versionCode="5"
-    android:versionName="1.4" >
+    android:versionCode="6"
+    android:versionName="1.5" >
+
 
     <uses-sdk
         android:minSdkVersion="16"
         android:targetSdkVersion="19" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-    <uses-permission android:name="com.skubit.BILLING" />
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="net.skubit.BILLING" />
+
 
     <permission
         android:name="com.skubit.BILLING"
@@ -39,6 +43,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.coinbase.zxing.client.android.CaptureActivity"
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name="com.skubit.android.ContactInfoActivity"
@@ -73,6 +81,31 @@
             android:label="@string/app_name"
             android:theme="@style/PurchaseDialog"
             android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.skubit.android.RequestMoneyActivity"
+            android:label="@string/app_name"
+            android:theme="@style/PurchaseDialog"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
+        <activity
+            android:name="com.skubit.android.SendMoneyActivity"
+            android:label="@string/app_name"
+            android:theme="@style/PurchaseDialog"
+            android:windowSoftInputMode="adjustPan" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <data android:scheme="bitcoin" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <activity
             android:name="com.skubit.android.transactions.TransactionDetailsActivity"

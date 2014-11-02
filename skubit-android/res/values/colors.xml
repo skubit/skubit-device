@@ -15,4 +15,11 @@
     <color name="wallet_balance_color">#50bf82</color>
     <color name="wallet_balance_color_invalid">#666666</color>
 
+    <!-- zxing -->
+    <color name="barcode_viewfinder_laser">#ffcc0000</color>
+    <color name="barcode_viewfinder_mask">#60000000</color>
+    <color name="barcode_possible_result_points">#c0ffbd21</color>
+    <color name="barcode_result_view">#b0000000</color>
+    <color name="barcode_result_points">#c099cc00</color>
+
 </resources>
