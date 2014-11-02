@@ -21,6 +21,7 @@ import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.PUT;
 
+import com.skubit.shared.dto.BitcoinAddressDto;
 import com.skubit.shared.dto.UserDto;
 import com.skubit.shared.rest.PathParameter;
 import com.skubit.shared.rest.ResourcesPath;
@@ -35,5 +36,11 @@ public interface AccountsRestService {
     @PUT(baseUri + "/" + PathParameter.USER_PROFILE)
     void putUserProfile(@Body
     UserDto userProfileDto, Callback<Void> result);
+    
+    @PUT(baseUri + "/newAddress")
+    void newBitcoinAddress(Callback<BitcoinAddressDto> result);
+       
+    @GET(baseUri + "/addresses/current")
+    void getCurrentAddress(Callback<BitcoinAddressDto> result);
 
 }

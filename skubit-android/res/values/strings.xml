@@ -20,4 +20,7 @@
     <string name="wallet_balance_label">CURRENT BALANCE</string>
     <string name="wallet_balance_def">-.----</string>
 
+    <!-- zxing -->
+    <string name="barcode_scan_message">Place a Bitcoin barcode inside the\nviewfinder to scan it.</string>
+
 </resources>

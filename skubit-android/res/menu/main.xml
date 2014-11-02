@@ -1,14 +1,26 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/action_qrcode"
+        android:id="@+id/action_receive"
+        android:icon="@drawable/ic_action_download"
         android:orderInCategory="1"
         android:showAsAction="always"
-        android:title="QRCode"
-        android:icon="@drawable/ic_action_barcode"/>
+        android:title="Receive"/>
+    <item
+        android:id="@+id/action_send"
+        android:icon="@drawable/ic_action_send_now"
+        android:orderInCategory="2"
+        android:showAsAction="always"
+        android:title="Send"/>
+    <item
+        android:id="@+id/action_qrcode"
+        android:icon="@drawable/ic_action_barcode"
+        android:orderInCategory="3"
+        android:showAsAction="always"
+        android:title="QRCode"/>
     <item
         android:id="@+id/action_notice"
-        android:orderInCategory="2"
+        android:orderInCategory="4"
         android:showAsAction="collapseActionView|withText"
         android:title="Open Source Licenses">
     </item>

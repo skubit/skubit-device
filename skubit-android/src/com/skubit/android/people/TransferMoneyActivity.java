@@ -1,26 +1,11 @@
 
 package com.skubit.android.people;
 
+import net.skubit.android.R;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
-
-import com.android.volley.toolbox.NetworkImageView;
-import com.google.android.gms.plus.PlusShare;
-import com.google.gson.Gson;
-import com.skubit.android.AccountSettings;
-import com.skubit.android.Constants;
-import com.skubit.android.FontManager;
-import com.skubit.android.SkubitApplication;
-import com.skubit.android.billing.PurchaseData;
-import com.skubit.android.purchases.DonationActivity;
-import com.skubit.android.services.TransactionService;
-import com.skubit.shared.dto.ErrorMessage;
-import com.skubit.shared.dto.TransactionDto;
-import com.skubit.shared.dto.UserDto;
-
-import net.skubit.android.R;
 import android.accounts.Account;
 import android.app.Activity;
 import android.content.Intent;
@@ -31,10 +16,21 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.toolbox.NetworkImageView;
+import com.google.android.gms.plus.PlusShare;
+import com.google.gson.Gson;
+import com.skubit.android.Constants;
+import com.skubit.android.FontManager;
+import com.skubit.android.SkubitApplication;
+import com.skubit.android.Utils;
+import com.skubit.android.services.TransactionService;
+import com.skubit.shared.dto.ErrorMessage;
+import com.skubit.shared.dto.TransactionDto;
+import com.skubit.shared.dto.UserDto;
 
 public class TransferMoneyActivity extends Activity {
 
@@ -54,20 +50,26 @@ public class TransferMoneyActivity extends Activity {
         return intent;
     }
 
-    private TextView mTitle;
-    private View mLoading;
-    private View mMain;
-    private TextView mPurchaseLabel;
-    private LinearLayout mTransferMessage;
     private Account mAccount;
     private EditText mAmount;
-    private TextView mMessageView;
     private TextView mEmail;
+    private NetworkImageView mIcon;
+    private View mLoading;
+    private View mMain;
+    private TextView mMessageView;
+    private Button mPurchaseBtn;
+    private TextView mPurchaseLabel;
+    private TextView mTitle;
     private String mToId;
     private String mToName;
-    private Button mPurchaseBtn;
     private TransactionService mTransactionService;
-    private NetworkImageView mIcon;
+    private LinearLayout mTransferMessage;
+
+    public void hideMessage() {
+        mTransferMessage.setVisibility(View.INVISIBLE);
+        mLoading.setVisibility(View.INVISIBLE);
+        mMain.setVisibility(View.VISIBLE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +98,10 @@ public class TransferMoneyActivity extends Activity {
         this.mMessageView = (TextView) findViewById(R.id.purchase_text);
 
         this.mIcon = (NetworkImageView) findViewById(R.id.icon);
-
-        mToId = (String) getIntent().getStringExtra("TransferMoneyActivity.toId");
-        mToName = (String) getIntent().getStringExtra("TransferMoneyActivity.toName");
+        this.mIcon.setDefaultImageResId(R.drawable.ic_action_user);
+        
+        mToId = getIntent().getStringExtra("TransferMoneyActivity.toId");
+        mToName = getIntent().getStringExtra("TransferMoneyActivity.toName");
 
         String imageUrl = getIntent().hasExtra("TransferMoneyActivity.imageUrl") ? (String) getIntent()
                 .getStringExtra("TransferMoneyActivity.imageUrl")
@@ -127,7 +130,7 @@ public class TransferMoneyActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                if (!isNumeric(mAmount.getText().toString())) {
+                if (!Utils.isNumeric(mAmount.getText().toString())) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -225,18 +228,4 @@ public class TransferMoneyActivity extends Activity {
         mMessageView.setText(message);
     }
 
-    public void hideMessage() {
-        mTransferMessage.setVisibility(View.INVISIBLE);
-        mLoading.setVisibility(View.INVISIBLE);
-        mMain.setVisibility(View.VISIBLE);
-    }
-
-    protected boolean isNumeric(String value) {
-        try {
-            Double.parseDouble(value);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
 }

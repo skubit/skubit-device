@@ -17,7 +17,6 @@
 package com.skubit.android;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import net.skubit.android.R;
 import android.accounts.AccountManager;
@@ -29,7 +28,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender.SendIntentException;
 import android.content.pm.ActivityInfo;
-import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -60,10 +58,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.plus.People;
-import com.google.android.gms.plus.People.LoadPeopleResult;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
 import com.skubit.android.auth.AuthenticationService;
@@ -74,7 +69,7 @@ import com.skubit.android.qr.QrCodeActivity;
 import com.skubit.android.transactions.TransactionsFragment;
 
 public class SkubitAndroidActivity extends Activity implements
-        ConnectionCallbacks, OnConnectionFailedListener, ResultCallback<People.LoadPeopleResult> {
+        ConnectionCallbacks, OnConnectionFailedListener {
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -382,6 +377,10 @@ public class SkubitAndroidActivity extends Activity implements
         setColorResource(R.color.action_bar_coin_color);
 
         mAccountSettings = AccountSettings.get(this);
+        String cookie = mAccountSettings.retrieveCookie();
+        if(TextUtils.isEmpty(cookie)) {
+            this.signoutOfSkubit();//bad cookie, remove all account info
+        }
         createGooglePlusClient(mAccountSettings.retrieveGoogleAccount());
 
         mImageLoader = ((SkubitApplication) getApplication())
@@ -410,8 +409,6 @@ public class SkubitAndroidActivity extends Activity implements
             }
         };
 
-        // String[] drawerItems =
-        // getResources().getStringArray(R.array.drawer_items);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerListFrame = (LinearLayout) this.findViewById(R.id.left_drawer_frame);
 
@@ -450,13 +447,21 @@ public class SkubitAndroidActivity extends Activity implements
             }
         } else if (order == 1) {
             Intent i = new Intent();
+            i.setClass(this, RequestMoneyActivity.class);
+            startActivity(i);           
+        } else if (order == 2) {
+            Intent i = new Intent();
+            i.setClass(this, SendMoneyActivity.class);
+            startActivity(i);
+        } else if (order == 3) {
+            Intent i = new Intent();
             i.setClass(this, QrCodeActivity.class);
             startActivity(i);
-        } else if (order == 2) {
+        } else if (order == 4) {
             Intent i = new Intent();
             i.setClass(this, DisplayLicensesActivity.class);
             startActivity(i);
-            
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -472,11 +477,6 @@ public class SkubitAndroidActivity extends Activity implements
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onResult(LoadPeopleResult arg0) {
-
     }
 
     @Override
@@ -640,5 +640,4 @@ public class SkubitAndroidActivity extends Activity implements
         Log.d(TAG, "Unlock Orientation");
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     }
-   
 }

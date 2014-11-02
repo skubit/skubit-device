@@ -19,7 +19,9 @@ package com.skubit.android.auth;
 import retrofit.RequestInterceptor;
 import android.accounts.Account;
 import android.content.Context;
+import android.text.TextUtils;
 
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.skubit.android.AccountSettings;
 
 public class GoogleTokenInterceptor implements RequestInterceptor {
@@ -35,9 +37,10 @@ public class GoogleTokenInterceptor implements RequestInterceptor {
 
     @Override
     public void intercept(RequestFacade request) {
+        String cookie = AccountSettings.get(mContext).retrieveCookie();
+
         request.addHeader("Content-Type", "application/json");
-        request.addHeader("Cookie", "skubit="
-                + AccountSettings.get(mContext).retrieveCookie());
+        request.addHeader("Cookie", "skubit="+ cookie);
         // If cookie expired, get another
         String token = null;
         // TODO handle refresh

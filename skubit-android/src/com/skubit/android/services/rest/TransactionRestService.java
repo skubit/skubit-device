@@ -36,7 +36,7 @@ public interface TransactionRestService {
 
     @GET(baseUri + "/" + PathParameter.BALANCE)
     void getBalance(Callback<String> balance);
-    
+
     @Headers("Content-Type: application/json")
     @GET(baseUri + "/activity")
     void getTransactions(
@@ -49,7 +49,23 @@ public interface TransactionRestService {
 
     @Headers("Content-Type: application/json")
     @POST(baseUri + "/transfer/{amount}")
-    void makeTransfer(@Path("amount") String amount,
-            @Body UserDto toUserDto, Callback<TransactionDto> response);
+    void makeTransfer(@Path("amount")
+    String amount,
+            @Body
+            UserDto toUserDto, Callback<TransactionDto> response);
+
+    @POST(baseUri + "/payout/{payoutAddress}/{payoutAmount}")
+    void makePayout(@Path("payoutAddress")
+    String payoutAddress,
+            @Path("payoutAmount")
+            String payoutAmount, @Body
+            String note, Callback<TransactionDto> response);
+
+    @POST(baseUri + "/send/{payoutAddress}/{payoutAmount}")
+    void sendMoney(@Path("payoutAddress")
+    String payoutAddress,
+            @Path("payoutAmount")
+            String payoutAmount, @Body
+            String note, Callback<TransactionDto> response);
 
 }

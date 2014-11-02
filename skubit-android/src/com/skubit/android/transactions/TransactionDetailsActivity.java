@@ -11,6 +11,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skubit.android.FontManager;
+import com.skubit.android.currencies.Bitcoin;
+import com.skubit.android.currencies.Satoshi;
 import com.skubit.shared.dto.TransactionDto;
 import com.skubit.shared.dto.TransactionState;
 import com.skubit.shared.dto.TransactionType;
@@ -48,6 +50,7 @@ public class TransactionDetailsActivity extends Activity {
         TextView status = (TextView) this.findViewById(R.id.transactiondetails_status);
         TextView date = (TextView) this.findViewById(R.id.transactiondetails_date);
         TextView label = (TextView) this.findViewById(R.id.transactiondetails_label_amount);
+        TextView fee = (TextView) this.findViewById(R.id.transactiondetails_fee);
         
         ObjectMapper mapper = new ObjectMapper();
         TransactionDto transactionDto = null;
@@ -73,11 +76,13 @@ public class TransactionDetailsActivity extends Activity {
             label.setText("Amount Withdrew");
         }  else if(type.equals(TransactionType.REFUND)) {
             label.setText("Amount Refunded");
+        } else if(type.equals(TransactionType.TRANSFER)) {
+            label.setText("Amount Transfered");
         }
-        
-        System.out.println(transactionDto);
+
         formatStatus(status, transactionDto.getTransactionState());
         formatBalance(amount, transactionDto.getAmount());
+        fee.setText(new Bitcoin(new Satoshi(transactionDto.getFee())).getDisplay());
        // amount.setText(mFormat.format(Double.parseDouble(transactionDto.getAmount())));
         
         notes.setText(transactionDto.getNote());
@@ -90,31 +95,6 @@ public class TransactionDetailsActivity extends Activity {
             date.setText(null);
         }
         
-        /*
-        try {
-
-            JSONObject amountObj = transaction.getJSONObject("amount");
-            amount.setText(mFormat.format(Double.parseDouble(amountObj.getString("amount"))));
-
-            status.setText(transaction.getString("status"));
-
-            JSONObject sender = transaction.getJSONObject("sender");
-            from.setText(sender.getString("name") + " (" + sender.getString("email") + ")");
-
-            JSONObject recipient = transaction.getJSONObject("recipient");
-            to.setText(recipient.getString("name") + " (" + recipient.getString("email") + ")");
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy, 'at' hh:mma zzz");
-            try {
-                String createdAt = transaction.optString("created_at");
-                date.setText(dateFormat.format(ISO8601.toCalendar(createdAt).getTime()));
-            } catch (ParseException e) {
-                date.setText(null);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        */
     }
     
     private void formatStatus(TextView view, TransactionState status) {
