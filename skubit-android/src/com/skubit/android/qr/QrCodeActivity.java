@@ -81,7 +81,7 @@ public class QrCodeActivity extends Activity {
         mAddress = (TextView) this.findViewById(R.id.bitcoin_address);
         mAmount = (TextView) this.findViewById(R.id.bitcoin_amount);
         
-        String account = mAccountSettings.retrieveGoogleAccount();
+        String account = mAccountSettings.retrieveBitIdAccount();
         if (TextUtils.isEmpty(account)) {
             return;
         }

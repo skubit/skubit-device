@@ -76,7 +76,7 @@ public class DrawerAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup arg2) {
         if (convertView == null) {
-            if (position < 4) {
+            if (position < 2) {
                 convertView = mInflater.inflate(R.layout.drawer_list_item, null);
             } else {
                 convertView = mInflater.inflate(R.layout.drawer_list_item_low_priority, null);

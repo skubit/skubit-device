@@ -54,7 +54,7 @@ public class AccountSettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.settings_fragment, null);
         mAccountSettings = AccountSettings.get(getActivity());
-        String account = mAccountSettings.retrieveGoogleAccount();
+        String account = mAccountSettings.retrieveBitIdAccount();
         if (TextUtils.isEmpty(account)) {
             showMessage("User account has not yet been configured");
             return view;

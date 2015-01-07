@@ -59,10 +59,7 @@ public class DonationActivity extends BasePurchaseActivity {
                             Response response) {
                         hideLoading();
                         final PurchasingType type = skuDetailsDto.getType();
-                        if (type.equals(PurchasingType.contribution)) {
-                            mPurchaseLabel.setText("Enter Contribution Amount (BTC)");
-                            mPurchaseBtn.setText("DONATE");
-                        } else if (type.equals(PurchasingType.donation)) {
+                        if (type.equals(PurchasingType.donation)) {
                             mPurchaseLabel.setText("Enter Donation Amount (BTC)");
                             mPurchaseBtn.setText("DONATE");
                         } else if (type.equals(PurchasingType.gift)) {

@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.skubit.android"
-    android:versionCode="6"
-    android:versionName="1.5" >
+    android:versionCode="7"
+    android:versionName="2.0" >
 
 
     <uses-sdk
         android:minSdkVersion="16"
         android:targetSdkVersion="19" />
 
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="net.skubit.BILLING" />
-
 
     <permission
         android:name="com.skubit.BILLING"
@@ -67,6 +62,12 @@
             android:theme="@style/LicenseDialog"
             android:windowSoftInputMode="adjustPan" >
         </activity>
+        <activity
+            android:name="com.skubit.android.auth.LoginActivity"
+            android:exported="true"
+            android:label="@string/app_name">
+        </activity>
+                
         <activity
             android:name="com.skubit.android.purchases.PurchaseActivity"
             android:exported="true"
@@ -125,6 +126,11 @@
                 <action android:name="com.skubit.android.billing.IBillingService.BIND" />
             </intent-filter>
         </service>
+       
+        <provider
+            android:name="com.skubit.android.provider.KeyProvider"
+            android:authorities="com.skubit.android.provider"
+            android:exported="false" />       
     </application>
 
 </manifest>

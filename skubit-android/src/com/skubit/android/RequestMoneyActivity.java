@@ -3,23 +3,20 @@ package com.skubit.android;
 
 import java.math.BigDecimal;
 
-import com.skubit.android.people.TransferMoneyActivity;
-import com.skubit.android.qr.QrCodeActivity;
-
-import com.skubit.android.R;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.skubit.android.qr.QrCodeActivity;
 
 public class RequestMoneyActivity extends Activity {
 
@@ -54,7 +51,7 @@ public class RequestMoneyActivity extends Activity {
         mAccountSettings = AccountSettings.get(this);
         final String address = mAccountSettings.retrieveBitcoinAddress();
 
-        final String email = mAccountSettings.retrieveGoogleAccount();
+        final String email = mAccountSettings.retrieveBitIdAccount();
         mEmail = (TextView) this.findViewById(R.id.email);
         mEmail.setText(email);
 

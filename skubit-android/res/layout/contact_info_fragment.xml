@@ -8,9 +8,9 @@
         android:id="@+id/contactLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:text="Donations Contact Info"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_margin="5dp"/>
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ScrollView
         android:id="@+id/scrollView1"
@@ -22,8 +22,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:paddingBottom="10dp"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:paddingBottom="10dp" >
 
             <TextView
                 android:id="@+id/fullNameLabel"
@@ -105,54 +105,24 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPostalAddress" />
-
-            <TextView
-                android:id="@+id/politicalLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Candidate Contributions (US/Federal)"
-                android:layout_marginBottom="10dp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-                        
-            <TextView
-                android:id="@+id/employerLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Employer" />
-
-            <EditText
-                android:id="@+id/employer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10" />
-
-            <TextView
-                android:id="@+id/occupationLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Occupation" />
-
-            <EditText
-                android:id="@+id/occupation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10" />
         </LinearLayout>
     </ScrollView>
+
     <View
         style="@style/Divider"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp" />
-    
+
     <RelativeLayout
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" >
+
         <Button
             android:id="@+id/saveBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"            
+            android:layout_alignParentRight="true"
             android:text="Save" />
     </RelativeLayout>
 

@@ -169,7 +169,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
          * BillingResponseCodes.RESULT_ITEM_ALREADY_OWNED)
          */
         Intent purchaseIntent = null;
-        if ("donation".equals(type) || "gift".equals(type) || "contribution".equals(type)) {
+        if ("donation".equals(type) || "gift".equals(type)) {
             purchaseIntent = makeDonationIntent(apiVersion, packageName, sku, developerPayload,
                     type);
         } else {
@@ -183,7 +183,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
             return bundle;
         }
         PendingIntent pending = PendingIntent.getActivity(mContext,
-                (sku + mAccountSettings.retrieveGoogleAccount()).hashCode(),
+                (sku + mAccountSettings.retrieveBitIdAccount()).hashCode(),
                 purchaseIntent, 0);
         bundle.putParcelable("BUY_INTENT", pending);
 
@@ -192,7 +192,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
     }
 
     private Account getCurrentGoogleAccount() {
-        String name = mAccountSettings.retrieveGoogleAccount();
+        String name = mAccountSettings.retrieveBitIdAccount();
         return TextUtils.isEmpty(name) ? null : new Account(name, "com.google");
     }
 
@@ -357,7 +357,7 @@ public class BillingServiceBinder extends IBillingService.Stub {
 
     @Override
     public boolean isAuthenticated(boolean startDialog) throws RemoteException {
-        String googleAccount = mAccountSettings.retrieveGoogleAccount();
+        String googleAccount = mAccountSettings.retrieveBitIdAccount();
 
         if (!exists(googleAccount, "com.google")) {
             if (startDialog) {
@@ -479,7 +479,6 @@ public class BillingServiceBinder extends IBillingService.Stub {
 
     private boolean isDonationType(String type) {
         return TextUtils.equals(type, "donation")
-                || TextUtils.equals(type, "contribution")
                 || TextUtils.equals(type, "gift");
     }
 }

@@ -19,11 +19,11 @@
         android:orientation="vertical"
         android:id="@+id/left_drawer_frame" >
 
-        <com.skubit.android.GoogleAccountView
+        <com.skubit.android.BitIdAccountView
             android:id="@+id/google_accounts"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-        </com.skubit.android.GoogleAccountView>
+            android:layout_height="wrap_content" > 
+        </com.skubit.android.BitIdAccountView>
 
         <ListView
             android:id="@+id/left_drawer"

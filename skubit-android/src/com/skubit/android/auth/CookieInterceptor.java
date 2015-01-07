@@ -24,13 +24,13 @@ import android.text.TextUtils;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.skubit.android.AccountSettings;
 
-public class GoogleTokenInterceptor implements RequestInterceptor {
+public class CookieInterceptor implements RequestInterceptor {
 
     private final Account mAccount;
 
     private Context mContext;
 
-    public GoogleTokenInterceptor(Account account, Context context) {
+    public CookieInterceptor(Account account, Context context) {
         mAccount = account;
         this.mContext = context;
     }
@@ -40,17 +40,9 @@ public class GoogleTokenInterceptor implements RequestInterceptor {
         String cookie = AccountSettings.get(mContext).retrieveCookie();
 
         request.addHeader("Content-Type", "application/json");
-        request.addHeader("Cookie", "skubit="+ cookie);
+        request.addHeader("Cookie", cookie);
+       // request.addHeader("Cookie", "skubit="+ cookie);
         // If cookie expired, get another
-        String token = null;
-        // TODO handle refresh
-        /*
-         * try { token = GoogleAuthUtil.getToken(mContext, mAccount.name, type);
-         * request.addQueryParam("access_token", token); } catch
-         * (UserRecoverableAuthException e) { e.printStackTrace(); } catch
-         * (IOException e) { e.printStackTrace(); } catch (GoogleAuthException
-         * e) { e.printStackTrace(); }
-         */
     }
 
 }

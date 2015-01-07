@@ -16,9 +16,6 @@
 
 package com.skubit.android;
 
-import java.io.IOException;
-
-import com.skubit.android.R;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Fragment;
@@ -26,7 +23,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender.SendIntentException;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -51,25 +47,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.PlusShare;
-import com.skubit.android.auth.AuthenticationService;
+import com.skubit.android.auth.LoginActivity;
 import com.skubit.android.billing.BillingServiceBinder;
 import com.skubit.android.osl.DisplayLicensesActivity;
-import com.skubit.android.people.PeopleFragment;
+import com.skubit.android.provider.accounts.AccountsColumns;
 import com.skubit.android.qr.QrCodeActivity;
 import com.skubit.android.transactions.TransactionsFragment;
 
-public class SkubitAndroidActivity extends Activity implements
-        ConnectionCallbacks, OnConnectionFailedListener {
+public class SkubitAndroidActivity extends Activity  {
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -77,12 +62,6 @@ public class SkubitAndroidActivity extends Activity implements
             selectItem(position);
         }
     }
-
-    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
-    private static final int RC_SIGN_IN = 9001;
-
-    private static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
 
     private static final String sAboutUrl = "https://catalog.skubit.com/#!/about";
 
@@ -117,9 +96,7 @@ public class SkubitAndroidActivity extends Activity implements
 
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private GoogleAccountView mGoogleAccountView;
-
-    private GoogleApiClient mGoogleApiClient;
+    private BitIdAccountView mAccountView;
 
     private ImageLoader mImageLoader;
 
@@ -128,45 +105,7 @@ public class SkubitAndroidActivity extends Activity implements
     private boolean mResolvingError;
 
     private boolean accountMatchesStoredAccount(String account) {
-        return account.equals(mAccountSettings.retrieveGoogleAccount());
-    }
-
-    private boolean checkPlayServices() {
-        int statusCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (statusCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(statusCode)) {
-                GooglePlayServicesUtil.getErrorDialog(statusCode, this,
-                        REQUEST_CODE_RECOVER_PLAY_SERVICES).show();
-            } else {
-                Toast.makeText(this, "This device is not supported.",
-                        Toast.LENGTH_LONG).show();
-                finish();
-            }
-            return false;
-        }
-        return true;
-    }
-
-    private void connectToGoogleApi() {
-        if ((!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting())
-                && !mResolvingError) {
-            Log.d(TAG, "onStart - connecting: " + mLoginInProcess);
-            lockOrientation();
-            mGoogleApiClient.connect();
-        }
-    }
-
-    private void createGooglePlusClient(String accountName) {
-        GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API)
-                .addScope(new Scope("email"))
-                .addScope(Plus.SCOPE_PLUS_LOGIN);
-        if (!TextUtils.isEmpty(accountName)) {
-            builder = builder.setAccountName(accountName);
-        }
-        mGoogleApiClient = builder.build();
+        return account.equals(mAccountSettings.retrieveBitIdAccount());
     }
 
     private void doToast(final String message) {
@@ -176,14 +115,6 @@ public class SkubitAndroidActivity extends Activity implements
                 Toast.makeText(SkubitAndroidActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private String getCurrentGooglePlusAccount() {
-        return Plus.AccountApi.getAccountName(mGoogleApiClient);
-    }
-
-    public GoogleApiClient getGoogleApiClient() {
-        return mGoogleApiClient;
     }
 
     private void lockOrientation() {
@@ -198,160 +129,9 @@ public class SkubitAndroidActivity extends Activity implements
     }
 
     @Override
-    protected void onActivityResult(final int requestCode, int resultCode,
-            final Intent data) {
-        Log.d(TAG, "onActivityResult:" + requestCode);
-        if (RC_SIGN_IN == requestCode) {
-            Log.d(TAG, "onActivityResult: rc-sign-in");
-            mResolvingError = false;
-            unlockOrientation();
-            if (!mLoginInProcess) {
-                signinToSkubit();
-            }
-        } else if (requestCode == 300 && data != null) {
-            String accountName = data
-                    .getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            signoutOfSkubit();
-            Log.d(TAG, "onActivityResult: 300 - " + accountName);
-            signoutOfGooglePlus();
-
-            createGooglePlusClient(accountName);
-            connectToGoogleApi();
-
-        }
-        else if (requestCode == 200 && data != null) {
-            Log.d(TAG, "onActivityResult: running login thread");
-            Thread loginThread = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    final String account = data
-                            .getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                    Log.d(TAG, "onActivityResult. loginThread - found account" + account);
-                    try {
-                        AuthenticationService authService = new AuthenticationService(
-                                SkubitAndroidActivity.this);
-                        authService.login(account);
-                        mAccountSettings.saveGoogleAccount(account);
-                        LocalBroadcastManager.getInstance(SkubitAndroidActivity.this)
-                                .sendBroadcast(new Intent("account"));
-                        mLoginInProcess = false;
-                        unlockOrientation();
-                    } catch (UserRecoverableAuthException e1) {
-                        e1.printStackTrace();
-                        Log.d(TAG, "onActivityResult. loginThread - User Recoverable");
-                        startActivityForResult(e1.getIntent(),
-                                PLAY_SERVICES_RESOLUTION_REQUEST);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                        doToast("Login error:" + e1.getMessage());
-                        mLoginInProcess = false;
-                        unlockOrientation();
-                    } catch (GoogleAuthException e1) {
-                        e1.printStackTrace();
-                        doToast("Login error:" + e1.getMessage());
-                        mLoginInProcess = false;
-                        unlockOrientation();
-                    }
-                    Log.d(TAG, "onActivityResult. loginThread - finished");
-
-                }
-
-            });
-            loginThread.start();
-
-        } else if (requestCode == PLAY_SERVICES_RESOLUTION_REQUEST
-                && data != null) {
-            Log.d(TAG, "onActivityResult. play services request");
-            final String account = data
-                    .getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            final String token = data
-                    .getStringExtra(AccountManager.KEY_AUTHTOKEN);
-            if (!TextUtils.isEmpty(token)) {
-                Log.d(TAG, "onActivityResult. loginWithCodeThread - starting");
-                Thread loginWithCodeThread = new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        AuthenticationService authService = new AuthenticationService(
-                                SkubitAndroidActivity.this);
-                        try {
-                            authService.loginWithCode(account, token);
-                            mAccountSettings.saveGoogleAccount(account);
-                            LocalBroadcastManager.getInstance(SkubitAndroidActivity.this)
-                                    .sendBroadcast(new Intent("account"));
-                        } catch (UserRecoverableAuthException e) {
-                            Log.d(TAG, "onActivityResult. loginWithCodeThread:" + e.getMessage());
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            Log.d(TAG, "onActivityResult. loginWithCodeThread:" + e.getMessage());
-                            doToast(e.getMessage());
-                        } catch (GoogleAuthException e) {
-                            Log.d(TAG, "onActivityResult. loginWithCodeThread:" + e.getMessage());
-                            doToast(e.getMessage());
-                        }
-                        mLoginInProcess = false;
-                        unlockOrientation();
-                    }
-                });
-
-                loginWithCodeThread.start();
-            }
-        } else if (requestCode == REQUEST_CODE_RECOVER_PLAY_SERVICES) {
-            if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Please install Google Play Services.",
-                        Toast.LENGTH_SHORT).show();
-                finish();
-            }
-            return;
-        }
-    }
-
-    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public void onConnected(Bundle bunlde) {
-        Log.d(TAG, "onConnected");
-        mGoogleAccountView.setGoogleApiClient(mGoogleApiClient);
-        mGoogleAccountView.setAccountName();
-
-        signinToSkubit();
-        final String account = getCurrentGooglePlusAccount();
-        Log.d(TAG, "loginToSkubit - account ");
-        if (!accountMatchesStoredAccount(account) && mLoginInProcess != true) {
-            Log.d(TAG, "loginToSkubit - code path");
-            this.mLoginInProcess = true;
-            Intent data = new Intent();
-            data.putExtra(AccountManager.KEY_ACCOUNT_NAME, account);
-            onActivityResult(200, 0, data);
-        }
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.d(TAG, "onConnectionFailed");
-        if (!mResolvingError && result.hasResolution()) {
-            try {
-                mResolvingError = true;
-                Log.d(TAG, "onConnectionFailed - start intent sender");
-                this.lockOrientation();
-                startIntentSenderForResult(result.getResolution().getIntentSender(),
-                        RC_SIGN_IN, null, 0, 0, 0);
-            } catch (SendIntentException e) {
-                Log.d(TAG, "onConnectionFailed" + e.getMessage());
-                mResolvingError = false;
-                mGoogleApiClient.connect();
-            }
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int result) {
-
     }
 
     @Override
@@ -379,20 +159,21 @@ public class SkubitAndroidActivity extends Activity implements
         mAccountSettings = AccountSettings.get(this);
         String cookie = mAccountSettings.retrieveCookie();
         if(TextUtils.isEmpty(cookie)) {
-            this.signoutOfSkubit();//bad cookie, remove all account info
+            Intent intent = new Intent();
+            intent.setClass(this, LoginActivity.class);
+            this.startActivity(intent);
+            //TODO: get from db
+            //this.signoutOfSkubit();//bad cookie, remove all account info
         }
-        createGooglePlusClient(mAccountSettings.retrieveGoogleAccount());
 
         mImageLoader = ((SkubitApplication) getApplication())
                 .getImageLoader();
 
-        mGoogleAccountView = (GoogleAccountView) findViewById(R.id.google_accounts);
+        mAccountView = (BitIdAccountView) findViewById(R.id.google_accounts);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
                 GravityCompat.START);
-        mGoogleAccountView.initialize(this, this.mGoogleApiClient, mDrawerLayout,
-                mImageLoader);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
@@ -420,15 +201,9 @@ public class SkubitAndroidActivity extends Activity implements
 
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerAdapter.setBoldPosition(0);
-
-        Fragment fragment = null;
-        if (savedInstanceState != null) {
-            fragment = getFragmentManager().findFragmentByTag("settings");
-        } else {
-            fragment = new AccountSettingsFragment();
-            getFragmentManager().beginTransaction().add(R.id.main_container, fragment, "settings")
-                    .commit();
-        }
+        selectItem(0);
+        
+        mAccountView.initialize(this, mDrawerLayout);     
     }
 
     @Override
@@ -446,18 +221,22 @@ public class SkubitAndroidActivity extends Activity implements
                 return true;
             }
         } else if (order == 1) {
+            Intent intent = new Intent();
+            intent.setClass(this, LoginActivity.class);
+            startActivity(intent);        
+        } else if (order == 2) {
             Intent i = new Intent();
             i.setClass(this, RequestMoneyActivity.class);
             startActivity(i);           
-        } else if (order == 2) {
+        } else if (order == 3) {
             Intent i = new Intent();
             i.setClass(this, SendMoneyActivity.class);
             startActivity(i);
-        } else if (order == 3) {
+        } else if (order == 4) {
             Intent i = new Intent();
             i.setClass(this, QrCodeActivity.class);
             startActivity(i);
-        } else if (order == 4) {
+        } else if (order == 5) {
             Intent i = new Intent();
             i.setClass(this, DisplayLicensesActivity.class);
             startActivity(i);
@@ -487,6 +266,7 @@ public class SkubitAndroidActivity extends Activity implements
         unlockOrientation();
         LocalBroadcastManager.getInstance(this).registerReceiver(mAccountSignout,
                 new IntentFilter("signout"));
+        mAccountView.setAccountName();
     }
 
     @Override
@@ -498,22 +278,9 @@ public class SkubitAndroidActivity extends Activity implements
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(TAG, "onStart");
-        if (checkPlayServices()) {
-            connectToGoogleApi();
-            selectItem(mAccountSettings.getCurrentIndex());
-        }
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
         mAccountSettings.setCurrentIndex(mCurrentPosition);
     }
 
@@ -528,11 +295,7 @@ public class SkubitAndroidActivity extends Activity implements
     }
 
     private void resignIn(String accountName) {
-        signoutOfSkubit();
-        signoutOfGooglePlus();
-
-        createGooglePlusClient(accountName);
-        connectToGoogleApi();
+        //signoutOfSkubit();
     }
 
     private void selectItem(int position) {
@@ -545,54 +308,27 @@ public class SkubitAndroidActivity extends Activity implements
             replaceFragmentFor("transactions", new TransactionsFragment());
         }
         else if (position == 1) {
-            replaceFragmentFor("circles", new PeopleFragment());
-        }
-        else if (position == 2) {
-            replaceFragmentFor("contact", new ContactInfoFragment());
-        }
-        else if (position == 3) {
             replaceFragmentFor("settings", new AccountSettingsFragment());
         }
-        else if (position == 4) {
-            PlusShare.Builder builder = new PlusShare.Builder(this);
-            builder.addCallToAction("INSTALL_APP",
-                    Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()),
-                    null);
-            builder.setContentUrl(Uri
-                    .parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
-            builder.setText("Check out the Skubit app: in-app purchases with Bitcoin");
-
-            try {
-                Intent shareIntent = builder.getIntent();
-                startActivityForResult(shareIntent, 10000);
-            } catch (Exception e) {
-                Toast.makeText(this,
-                        "Unable to share app. Make sure you have Google+ app installed",
-                        Toast.LENGTH_LONG).show();
-                // Activity not found - google plus not installed
-            }
-        }
-        else if (position == 5) {
+        else if (position == 2) {
             browserIntent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse(sAboutUrl));
             startActivity(browserIntent);
-        } else if (position == 6) {
+        } else if (position == 3) {
             browserIntent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse(sPrivacyUrl));
             startActivity(browserIntent);
-        } else if (position == 7) {
+        } else if (position == 4) {
             browserIntent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse(sHelpUrl));
             startActivity(browserIntent);
-        } else if (position == 8) {
-            Log.d(TAG, "Logout: " + mGoogleApiClient.isConnected());
+        } else if (position == 5) {         
             mLoginInProcess = false;
-            signoutOfGooglePlusAndConnect();
             signoutOfSkubit();
             position = 0;
             replaceFragmentFor("settings", new AccountSettingsFragment());
         }
-        if (position < 4) {
+        if (position < 2) {
             mDrawerAdapter.setBoldPosition(position);
             mDrawerList.setItemChecked(position, true);
         }
@@ -606,34 +342,36 @@ public class SkubitAndroidActivity extends Activity implements
                 new ColorDrawable(Color.parseColor(hex)));
     }
 
-    public void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {
-        this.mGoogleApiClient = mGoogleApiClient;
-    }
-
-    private void signinToSkubit() {
-        if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
-            Log.d(TAG, "loginToSkubit - connecting ");
-            mGoogleApiClient.connect();
-        }
-    }
-
-    private void signoutOfGooglePlus() {
-        if (mGoogleApiClient.isConnected()) {
-            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-            mGoogleApiClient.disconnect();
-        }
-    }
-
-    private void signoutOfGooglePlusAndConnect() {
-        if (mGoogleApiClient.isConnected()) {
-            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-            mGoogleApiClient.disconnect();
-            mGoogleApiClient.connect();
-        }
-    }
-
     private void signoutOfSkubit() {
-        new AuthenticationService(this).signout();
+        final AccountSettings accountSettings = AccountSettings.get(this);
+
+        Thread t = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    accountSettings.saveCookie(null);
+                    accountSettings.saveBitIdAccount(null);
+                    accountSettings.saveBitcoinAddress(null);
+                    getContentResolver().delete(AccountsColumns.CONTENT_URI, null, null);
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            mAccountView.setAccountName();
+                            finish();
+                        }
+                    });
+                                      
+                    LocalBroadcastManager.getInstance(SkubitAndroidActivity.this)
+                            .sendBroadcast(new Intent("account"));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        });
+        t.start();
     }
 
     private void unlockOrientation() {

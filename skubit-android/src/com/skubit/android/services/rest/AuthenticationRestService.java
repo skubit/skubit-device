@@ -19,22 +19,14 @@ package com.skubit.android.services.rest;
 import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.POST;
-import retrofit.http.Query;
 
 import com.skubit.shared.dto.CurrentUserDto;
-import com.skubit.shared.dto.LogInResultDto;
 import com.skubit.shared.rest.PathParameter;
 import com.skubit.shared.rest.ResourcesPath;
 
 public interface AuthenticationRestService {
 
     public static final String baseUri = ResourcesPath.AUTHENTICATION;
-
-    @POST(baseUri + "/" + PathParameter.CONNECT)
-    LogInResultDto postConnect(@Query("mobile")
-    boolean mobile,
-            @Body
-            String code);
 
     @POST(baseUri + "/" + PathParameter.LOGIN_WITH_COOKIE)
     CurrentUserDto postLoginWithCookie(@Body

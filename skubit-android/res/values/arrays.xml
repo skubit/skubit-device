@@ -3,11 +3,8 @@
 
     <string-array name="drawer_items">        
         <item>Transactions</item>
-        <item>People</item>
-        <item>Donation Info</item>
         <item>Account Settings</item>
         
-        <item>Share</item>
         <item>About</item>
         <item>Privacy</item>
         <item>Help</item>       

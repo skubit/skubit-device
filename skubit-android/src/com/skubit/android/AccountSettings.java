@@ -25,7 +25,7 @@ public class AccountSettings {
 
     private static final String COOKIE = "cookie";
 
-    private static final String GOOGLE_ACCOUNT = "googleAccount";
+    private static final String BITID_ACCOUNT = "bitIdAccount";
     
     private static final String INDEX = "index";
 
@@ -60,8 +60,8 @@ public class AccountSettings {
         return retrieveStringPreference(COOKIE);
     }
     
-    public String retrieveGoogleAccount() {
-        return retrieveStringPreference(GOOGLE_ACCOUNT);
+    public String retrieveBitIdAccount() {
+        return retrieveStringPreference(BITID_ACCOUNT);
     }
     
     private int retrieveIntPreference(String key) {
@@ -84,8 +84,8 @@ public class AccountSettings {
         saveStringPreference(COOKIE, cookie);
     }
 
-    public void saveGoogleAccount(String googleAccount) {
-        saveStringPreference(GOOGLE_ACCOUNT, googleAccount);
+    public void saveBitIdAccount(String googleAccount) {
+        saveStringPreference(BITID_ACCOUNT, googleAccount);
     }
 
     private void saveIntPreference(String key, int value) {

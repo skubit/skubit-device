@@ -69,7 +69,7 @@ public class TransactionsFragment extends Fragment {
     private TransactionService mTransactionService;
 
     public void getTransactions() {
-        String account = mAccountSettings.retrieveGoogleAccount();
+        String account = mAccountSettings.retrieveBitIdAccount();
         if (!TextUtils.isEmpty(account)) {
             mTransactionService = new TransactionService(new Account(account,
                     "com.google"), getActivity());
@@ -147,7 +147,7 @@ public class TransactionsFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        String account = mAccountSettings.retrieveGoogleAccount();
+        String account = mAccountSettings.retrieveBitIdAccount();
         if (!TextUtils.isEmpty(account)) {
             mTransactionService = new TransactionService(new Account(account,
                     "com.google"), getActivity());
@@ -160,7 +160,7 @@ public class TransactionsFragment extends Fragment {
     }
 
     public void refreshBalance() {
-        String account = mAccountSettings.retrieveGoogleAccount();
+        String account = mAccountSettings.retrieveBitIdAccount();
         if (TextUtils.isEmpty(account) || mTransactionService == null) {
             this.mBalance.setText("Loading");
             return;

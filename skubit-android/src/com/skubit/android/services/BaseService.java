@@ -23,14 +23,14 @@ import android.accounts.Account;
 import android.content.Context;
 
 import com.skubit.android.Constants;
-import com.skubit.android.auth.GoogleTokenInterceptor;
+import com.skubit.android.auth.CookieInterceptor;
 
 public abstract class BaseService<T> {
 
     private T mRestService;
 
     public BaseService(Account account, Context context) {
-        GoogleTokenInterceptor interceptor = new GoogleTokenInterceptor(
+        CookieInterceptor interceptor = new CookieInterceptor(
                 account, context);
         final RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(Constants.SKUBIT_CATALOG)

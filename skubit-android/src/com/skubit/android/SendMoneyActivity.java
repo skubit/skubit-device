@@ -57,7 +57,7 @@ public class SendMoneyActivity extends Activity {
 
         mAccountSettings = AccountSettings.get(this);
 
-        mAccount = new Account(mAccountSettings.retrieveGoogleAccount(), "com.google");
+        mAccount = new Account(mAccountSettings.retrieveBitIdAccount(), "com.google");
         if (mAccount == null) {
             showMessage("User account has not yet been configured");
             // TODO: Button should take user to app

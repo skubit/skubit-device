@@ -1,0 +1,13 @@
+{
+    "syntaxVersion":"2",
+    "projectPackageId": "com.skubit.android",
+    "authority": "com.skubit.android.provider",
+    "providerJavaPackage": "com.skubit.android.provider",
+    "providerClassName": "KeyProvider",
+    "sqliteOpenHelperClassName": "KeySQLiteOpenHelper",
+    "sqliteOpenHelperCallbacksClassName": "KeySQLiteOpenHelperCallbacks",
+    "sqliteUpgradeHelperClassName": "KeySQLiteUpgradeHelper",
+    "databaseFileName": "accounts.db",
+     "databaseVersion": 1,
+    "enableForeignKeys": false
+}

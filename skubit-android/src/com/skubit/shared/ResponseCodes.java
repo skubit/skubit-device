@@ -6,6 +6,4 @@ public class ResponseCodes {
 	
 	public static int FAILED_CREDENTIALS = 10001;
 	
-	public static int FAILED_TO_OBTAIN_TOKEN = 10002;
-	
 }

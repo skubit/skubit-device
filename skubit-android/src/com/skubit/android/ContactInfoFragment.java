@@ -48,11 +48,7 @@ public class ContactInfoFragment extends Fragment {
 
     private EditText mCity;
 
-    private EditText mEmployer;
-
     private EditText mFullName;
-
-    private EditText mOccupation;
 
     private Button mSaveButton;
 
@@ -71,7 +67,7 @@ public class ContactInfoFragment extends Fragment {
         View view = inflater.inflate(R.layout.contact_info_fragment, null);
 
         mAccountSettings = AccountSettings.get(getActivity());
-        String account = mAccountSettings.retrieveGoogleAccount();
+        String account = mAccountSettings.retrieveBitIdAccount();
         if (TextUtils.isEmpty(account)) {
             showMessage("User account has not yet been configured");
             return view;
@@ -80,9 +76,7 @@ public class ContactInfoFragment extends Fragment {
         mAddress1 = (EditText) view.findViewById(R.id.address1);
         mAddress2 = (EditText) view.findViewById(R.id.address2);
         mCity = (EditText) view.findViewById(R.id.city);
-        mEmployer = (EditText) view.findViewById(R.id.employer);
         mFullName = (EditText) view.findViewById(R.id.fullName);
-        mOccupation = (EditText) view.findViewById(R.id.occupation);
         mState = (EditText) view.findViewById(R.id.state);
         mZip = (EditText) view.findViewById(R.id.zip);
 
@@ -97,9 +91,7 @@ public class ContactInfoFragment extends Fragment {
 
                 UserDto userDto = new UserDto();
                 userDto.setCity(mCity.getText().toString());
-                userDto.setEmployer(mEmployer.getText().toString());
                 userDto.setFullName(mFullName.getText().toString());
-                userDto.setOccuption(mOccupation.getText().toString());
                 userDto.setState(mState.getText().toString());
                 userDto.setStreetAddress1(mAddress1.getText().toString());
                 userDto.setStreetAddress2(mAddress2.getText().toString());
@@ -139,9 +131,7 @@ public class ContactInfoFragment extends Fragment {
                 @Override
                 public void success(UserDto userDto, Response arg1) {
                     mCity.setText(userDto.getCity());
-                    mEmployer.setText(userDto.getEmployer());
                     mFullName.setText(userDto.getFullName());
-                    mOccupation.setText(userDto.getOccuption());
                     mState.setText(userDto.getState());
                     mAddress1.setText(userDto.getStreetAddress1());
                     mAddress2.setText(userDto.getStreetAddress2());
