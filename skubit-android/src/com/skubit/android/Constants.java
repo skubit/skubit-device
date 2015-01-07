@@ -18,7 +18,7 @@ package com.skubit.android;
 
 public class Constants {
 
-    public static final boolean IS_PRODUCTION = true;
+    public static final boolean IS_PRODUCTION = false;
 
     public static final boolean LOG_LEVEL_FULL = !IS_PRODUCTION;
 

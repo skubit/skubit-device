@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.util.Log;
 
-import com.skubit.android.BuildConfig;
+import net.skubit.android.BuildConfig;
 import com.skubit.android.provider.accounts.AccountsColumns;
 
 public class KeySQLiteOpenHelper extends SQLiteOpenHelper {

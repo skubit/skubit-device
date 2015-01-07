@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;

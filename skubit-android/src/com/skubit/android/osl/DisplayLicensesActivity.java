@@ -2,7 +2,7 @@ package com.skubit.android.osl;
 
 import java.io.IOException;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.os.Bundle;

@@ -16,7 +16,7 @@
 
 package com.skubit.android.transactions;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;

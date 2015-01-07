@@ -53,6 +53,7 @@ import com.skubit.android.osl.DisplayLicensesActivity;
 import com.skubit.android.provider.accounts.AccountsColumns;
 import com.skubit.android.qr.QrCodeActivity;
 import com.skubit.android.transactions.TransactionsFragment;
+import net.skubit.android.R;
 
 public class SkubitAndroidActivity extends Activity  {
 

@@ -7,7 +7,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 import android.accounts.Account;
 
 import android.app.Activity;

@@ -15,7 +15,7 @@
  */
 package com.skubit.android;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 import com.skubit.android.provider.accounts.AccountsColumns;
 import com.skubit.android.provider.accounts.AccountsCursor;
 

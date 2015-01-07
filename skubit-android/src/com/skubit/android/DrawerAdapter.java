@@ -17,7 +17,7 @@ package com.skubit.android;
 
 import java.util.ArrayList;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;

@@ -19,7 +19,7 @@ package com.coinbase.zxing.client.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 
 import android.content.Context;
 import android.content.res.Resources;

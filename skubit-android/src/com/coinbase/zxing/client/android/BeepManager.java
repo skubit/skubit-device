@@ -28,7 +28,7 @@ import android.util.Log;
 
 import java.io.IOException;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 
 /**
  * Manages beeps and vibrations for {@link CaptureActivity}.

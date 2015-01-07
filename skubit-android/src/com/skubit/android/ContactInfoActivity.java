@@ -15,7 +15,7 @@
  */
 package com.skubit.android;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;

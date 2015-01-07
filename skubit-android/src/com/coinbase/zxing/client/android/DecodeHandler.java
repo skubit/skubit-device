@@ -18,7 +18,7 @@ package com.coinbase.zxing.client.android;
 
 import java.util.Map;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 
 import android.content.res.Configuration;
 import android.graphics.Bitmap;

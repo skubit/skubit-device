@@ -17,7 +17,7 @@ import com.skubit.shared.dto.TransactionDto;
 import com.skubit.shared.dto.TransactionState;
 import com.skubit.shared.dto.TransactionType;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.ParseException;

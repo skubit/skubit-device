@@ -20,7 +20,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;

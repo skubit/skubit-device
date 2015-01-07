@@ -1,7 +1,7 @@
 {
     "syntaxVersion":"2",
-    "projectPackageId": "com.skubit.android",
-    "authority": "com.skubit.android.provider",
+    "projectPackageId": "net.skubit.android",
+    "authority": "net.skubit.android.provider",
     "providerJavaPackage": "com.skubit.android.provider",
     "providerClassName": "KeyProvider",
     "sqliteOpenHelperClassName": "KeySQLiteOpenHelper",

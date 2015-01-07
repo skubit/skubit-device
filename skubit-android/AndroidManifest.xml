@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.skubit.android"
+    package="net.skubit.android"
     android:versionCode="7"
     android:versionName="2.0" >
 
@@ -129,8 +129,8 @@
        
         <provider
             android:name="com.skubit.android.provider.KeyProvider"
-            android:authorities="com.skubit.android.provider"
-            android:exported="false" />       
+            android:authorities="net.skubit.android.provider"
+            android:exported="false" />     
     </application>
 
 </manifest>

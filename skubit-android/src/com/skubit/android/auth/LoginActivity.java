@@ -18,7 +18,7 @@ import android.webkit.WebViewClient;
 
 import com.skubit.android.AccountSettings;
 import com.skubit.android.Constants;
-import com.skubit.android.R;
+import net.skubit.android.R;
 import com.skubit.android.provider.accounts.AccountsColumns;
 import com.skubit.android.provider.accounts.AccountsContentValues;
 

@@ -18,7 +18,7 @@ package com.coinbase.zxing.client.android;
 
 import java.util.Collection;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;

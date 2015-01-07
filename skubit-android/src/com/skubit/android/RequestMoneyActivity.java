@@ -2,6 +2,7 @@
 package com.skubit.android;
 
 import java.math.BigDecimal;
+import net.skubit.android.R;
 
 import android.app.Activity;
 import android.content.ClipData;

@@ -17,7 +17,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
 
-import com.skubit.android.BuildConfig;
+import net.skubit.android.BuildConfig;
 import com.skubit.android.provider.accounts.AccountsColumns;
 
 public class KeyProvider extends ContentProvider {
@@ -28,7 +28,7 @@ public class KeyProvider extends ContentProvider {
     private static final String TYPE_CURSOR_ITEM = "vnd.android.cursor.item/";
     private static final String TYPE_CURSOR_DIR = "vnd.android.cursor.dir/";
 
-    public static final String AUTHORITY = "com.skubit.android.provider";
+    public static final String AUTHORITY = "net.skubit.android.provider";
     public static final String CONTENT_URI_BASE = "content://" + AUTHORITY;
 
     public static final String QUERY_NOTIFY = "QUERY_NOTIFY";

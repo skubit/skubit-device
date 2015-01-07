@@ -1,7 +1,7 @@
 
 package com.skubit.android.purchases;
 
-import com.skubit.android.R;
+import net.skubit.android.R;
 import android.accounts.Account;
 import android.app.Activity;
 import android.content.Intent;
