@@ -21,7 +21,6 @@ import android.accounts.Account;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.skubit.android.AccountSettings;
 
 public class CookieInterceptor implements RequestInterceptor {

@@ -16,7 +16,6 @@
 
 package com.skubit.android.zxing;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 import com.google.zxing.BarcodeFormat;
@@ -40,8 +39,8 @@ public class QRCodeEncoder {
         Map<EncodeHintType, Object> hints = null;
         String encoding = guessAppropriateEncoding(contentsToEncode);
         if (encoding != null) {
-            hints = new EnumMap<>(EncodeHintType.class);
-            hints.put(EncodeHintType.CHARACTER_SET, encoding);
+      //      hints = new EnumMap<>(EncodeHintType.class);
+       //     hints.put(EncodeHintType.CHARACTER_SET, encoding);
         }
         BitMatrix result;
         try {
