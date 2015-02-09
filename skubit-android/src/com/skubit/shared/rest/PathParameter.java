@@ -18,13 +18,13 @@ package com.skubit.shared.rest;
 
 public class PathParameter {
 
-    public static final String APPLICATIONS_APPLICATION = "applications/{application}";
+    public static final String INVENTORY_APPLICATION = "inventory/{application}";
 
-    public static final String APPLICATIONS_COUNT = "applications/count";
+    public static final String INVENTORY_COUNT = "inventory/count";
 
-    public static final String APPLICATIONS_CREATE = "applications/{application}";
+    public static final String INVENTORY_CREATE = "inventory/{application}";
 
-    public static final String APPLICATIONS_PUBLIC_KEY = "applications/{application}/publicKey";
+    public static final String INVENTORY_PUBLIC_KEY = "inventory/{application}/publicKey";
 
     public static final String BALANCE = "balance";
 
@@ -38,6 +38,6 @@ public class PathParameter {
 
     public static final String SKUS_SKUDETAILS = "skus/{application}/{productId}";
 
-    public static final String USER_PROFILE = "userProfile";
+    public static final String USER_PROFILE = "userProfile";    
 
 }

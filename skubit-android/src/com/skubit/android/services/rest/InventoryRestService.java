@@ -31,7 +31,7 @@ public interface InventoryRestService {
 
     public static final String baseUri = ResourcesPath.INVENTORY_API;
 
-    @GET(baseUri + "/" + PathParameter.APPLICATIONS_COUNT)
+    @GET(baseUri + "/" + PathParameter.INVENTORY_COUNT)
     Integer getApplicationCount(@Path("application")
     String application);
 

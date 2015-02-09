@@ -40,7 +40,7 @@ public class LoginActivity extends Activity {
 
         webView.setWebViewClient(new WebViewClient() {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.startsWith("bitid://")) {
+                if (url.startsWith("bitid://") || url.startsWith("tidbit://")) {
                     if(isAuthenticatorInstalled()) {
                         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(i);
